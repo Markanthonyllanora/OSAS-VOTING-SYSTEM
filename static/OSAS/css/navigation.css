@@ -1,0 +1,210 @@
+/* ==========================================================
+   OSAS Voting System - Navigation (sidebar + topbar)
+   ========================================================== */
+
+:root {
+  --navy-900: #0f1f4d;
+  --navy-800: #14275f;
+  --navy-hover: rgba(255, 255, 255, 0.08);
+  --navy-active: rgba(255, 255, 255, 0.16);
+  --accent: #8fb0ff;
+  --white: #ffffff;
+  --page-bg: #ffffff;
+  --text: #16213e;
+  --border: #dde2ef;
+
+  --sidebar-w: 240px;
+  --sidebar-w-collapsed: 76px;
+  --topbar-h: 64px;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+.app-body {
+  margin: 0;
+  font-family: "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif;
+  background: var(--page-bg);
+  color: var(--text);
+}
+
+.app-body :focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.app-body svg {
+  fill: none; stroke: currentColor; stroke-width: 2;
+  stroke-linecap: round; stroke-linejoin: round;
+}
+
+/* ---------- Layout ---------- */
+.app-layout { min-height: 100vh; }
+
+.app-main {
+  margin-left: var(--sidebar-w);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.app-content { flex: 1; padding: 24px; }
+
+/* ---------- Sidebar ---------- */
+.sidebar {
+  position: fixed;
+  inset: 0 auto 0 0;
+  width: var(--sidebar-w);
+  background: var(--navy-800);
+  color: var(--white);
+  display: flex;
+  flex-direction: column;
+  z-index: 40;
+}
+
+.sidebar-brand {
+  display: flex; align-items: center; gap: 12px;
+  margin: 0 20px;
+  padding: 18px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.35);
+  min-height: var(--topbar-h);
+}
+.sidebar-logo {
+  width: 44px; height: 44px; flex: none;
+  object-fit: contain;
+}
+.sidebar-brand-text { display: flex; flex-direction: column; line-height: 1.2; min-width: 0; }
+.sidebar-brand-text strong { font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sidebar-brand-text small { font-size: 12px; opacity: 0.85; }
+
+.sidebar-nav {
+  flex: 1;
+  display: flex; flex-direction: column; gap: 2px;
+  padding: 20px 0;
+  overflow-y: auto;
+}
+
+.nav-link {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 20px;
+  color: var(--white); text-decoration: none;
+  font-size: 15px; font-weight: 600;
+  border-left: 4px solid transparent;
+  transition: background 0.15s;
+}
+.nav-link:hover { background: var(--navy-hover); }
+.nav-link.active { background: var(--navy-active); border-left-color: var(--accent); }
+.nav-icon { width: 20px; height: 20px; flex: none; }
+
+/* Logout is a <button> inside a form, styled like the other links */
+.nav-form { margin: 0; }
+.nav-button {
+  width: 100%;
+  background: none;
+  border-top: 0; border-right: 0; border-bottom: 0;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.sidebar-footer {
+  padding: 16px 20px;
+  font-size: 10px; line-height: 1.5;
+  opacity: 0.6;
+}
+
+/* ---------- Topbar ---------- */
+.topbar {
+  position: sticky; top: 0; z-index: 30;
+  height: var(--topbar-h);
+  display: flex; align-items: center; gap: 14px;
+  padding: 0 24px;
+  background: var(--navy-800);
+  color: var(--white);
+}
+.topbar-title { flex: 1; margin: 0; font-size: 18px; font-weight: 600; min-width: 0; }
+
+.topbar-toggle {
+  display: none;
+  width: 40px; height: 40px;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.4); border-radius: 10px;
+  background: transparent; color: var(--white);
+  cursor: pointer;
+}
+.topbar-toggle svg { width: 20px; height: 20px; }
+
+/* ---------- Account (right side of the topbar) ---------- */
+.account { position: relative; }
+
+.account-btn {
+  display: flex; align-items: center; gap: 10px;
+  padding: 6px 8px; border: 0; border-radius: 10px;
+  background: transparent; color: var(--white);
+  font: inherit; text-align: left; cursor: pointer;
+  transition: background 0.15s;
+}
+.account-btn:hover,
+.account-btn[aria-expanded="true"] { background: var(--navy-hover); }
+
+.avatar {
+  width: 38px; height: 38px; flex: none;
+  display: grid; place-items: center;
+  border-radius: 50%;
+  background: #aab3cc; color: var(--navy-900);
+  font-weight: 700;
+}
+.account-info { display: flex; flex-direction: column; line-height: 1.25; min-width: 0; }
+.account-info strong { font-size: 14px; white-space: nowrap; }
+.account-info small { font-size: 12px; opacity: 0.85; }
+.account-chevron { width: 18px; height: 18px; flex: none; transition: transform 0.15s; }
+.account-btn[aria-expanded="true"] .account-chevron { transform: rotate(180deg); }
+
+.account-menu {
+  position: absolute;
+  top: calc(100% + 8px); right: 0;
+  min-width: 180px;
+  background: var(--white); color: var(--text);
+  border: 1px solid var(--border); border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(15, 31, 77, 0.25);
+  padding: 6px;
+}
+.account-menu[hidden] { display: none; }
+.account-menu-item {
+  display: block; width: 100%;
+  padding: 10px 12px; border: 0; border-radius: 6px;
+  background: none; color: inherit;
+  font: inherit; font-size: 14px; text-align: left; text-decoration: none;
+  cursor: pointer;
+}
+.account-menu-item:hover { background: #f3f5fb; }
+
+/* ---------- Mobile overlay ---------- */
+.sidebar-overlay {
+  position: fixed; inset: 0; z-index: 35;
+  background: rgba(10, 20, 50, 0.5);
+}
+.sidebar-overlay[hidden] { display: none; }
+
+/* ---------- Tablet: icon-only sidebar ---------- */
+@media (max-width: 1023px) and (min-width: 768px) {
+  .app-main { margin-left: var(--sidebar-w-collapsed); }
+  .sidebar { width: var(--sidebar-w-collapsed); }
+  .sidebar-brand { margin: 0 8px; justify-content: center; }
+  .sidebar-brand-text, .nav-label, .sidebar-footer { display: none; }
+  .nav-link { justify-content: center; padding: 14px 0; }
+}
+
+/* ---------- Mobile: off-canvas sidebar ---------- */
+@media (max-width: 767px) {
+  .app-main { margin-left: 0; }
+  .sidebar { transform: translateX(-100%); transition: transform 0.2s ease; }
+  .sidebar.is-open { transform: none; }
+  .topbar-toggle { display: grid; }
+  .topbar { padding: 0 14px; }
+  .app-content { padding: 16px; }
+}
+
+@media (max-width: 480px) {
+  .account-info { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sidebar, .account-chevron, .nav-link { transition: none; }
+}
