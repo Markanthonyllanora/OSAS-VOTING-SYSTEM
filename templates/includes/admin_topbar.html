@@ -1,0 +1,27 @@
+{# Needs `page_title` from the view. The account is on the right side of this topbar. #}
+<header class="topbar">
+  <button type="button" class="topbar-toggle" id="sidebarToggle" aria-label="Open navigation" aria-controls="appSidebar" aria-expanded="false">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
+  </button>
+
+  <h1 class="topbar-title">{{ page_title|default:"Dashboard" }}</h1>
+
+  <div class="account" id="accountMenuWrap">
+    <button type="button" class="account-btn" id="accountBtn" aria-haspopup="menu" aria-expanded="false" aria-controls="accountMenu">
+      <span class="avatar">{{ user.username|default:"A"|slice:":1"|upper }}</span>
+      <span class="account-info">
+        <strong>{{ user.get_full_name|default:user.username }}</strong>
+        <small>Administrator</small>
+      </span>
+      <svg class="account-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+    </button>
+
+    <div class="account-menu" id="accountMenu" role="menu" hidden>
+      <a href="#" class="account-menu-item" role="menuitem">Profile</a>
+      <form method="post" action="#">
+        {% csrf_token %}
+        <button type="submit" class="account-menu-item" role="menuitem">Log out</button>
+      </form>
+    </div>
+  </div>
+</header>

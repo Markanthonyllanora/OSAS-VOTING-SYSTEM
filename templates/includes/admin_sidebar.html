@@ -1,0 +1,55 @@
+{% load static %}
+{# Needs `active_page` from the view: dashboard | elections | candidates | results | announcements #}
+<aside class="sidebar" id="appSidebar" aria-label="Admin navigation">
+
+  <div class="sidebar-brand">
+    <img src="{% static 'images/logo.png' %}" alt="School logo" class="sidebar-logo">
+    <span class="sidebar-brand-text">
+      <strong>{{ user.username|default:"Username" }}</strong>
+      <small>BSIT</small>
+    </span>
+  </div>
+
+  <nav class="sidebar-nav">
+    {# Later, replace each href="#" with {% url 'your_url_name' %} #}
+    <a href="#" class="nav-link {% if active_page == 'dashboard' %}active{% endif %}" {% if active_page == 'dashboard' %}aria-current="page"{% endif %} title="Dashboard">
+      <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+      <span class="nav-label">Dashboard</span>
+    </a>
+
+    <a href="#" class="nav-link {% if active_page == 'elections' %}active{% endif %}" {% if active_page == 'elections' %}aria-current="page"{% endif %} title="Manage Elections">
+      <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="m9 16 2 2 4-4"/></svg>
+      <span class="nav-label">Manage Elections</span>
+    </a>
+
+    <a href="#" class="nav-link {% if active_page == 'candidates' %}active{% endif %}" {% if active_page == 'candidates' %}aria-current="page"{% endif %} title="Manage Candidates">
+      <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <span class="nav-label">Manage Candidates</span>
+    </a>
+
+    <a href="#" class="nav-link {% if active_page == 'results' %}active{% endif %}" {% if active_page == 'results' %}aria-current="page"{% endif %} title="Result">
+      <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
+      <span class="nav-label">Result</span>
+    </a>
+
+    <a href="#" class="nav-link {% if active_page == 'announcements' %}active{% endif %}" {% if active_page == 'announcements' %}aria-current="page"{% endif %} title="Announcement">
+      <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg>
+      <span class="nav-label">Announcement</span>
+    </a>
+
+    {# Logout must be a POST form in newer Django versions #}
+    <form method="post" action="#" class="nav-form">
+      {% csrf_token %}
+      <button type="submit" class="nav-link nav-button" title="Logout">
+        <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
+        <span class="nav-label">Logout</span>
+      </button>
+    </form>
+  </nav>
+
+  <footer class="sidebar-footer">
+    © 2026 Election System<br>Developed by BSIT Students
+  </footer>
+</aside>
+
+<div class="sidebar-overlay" id="sidebarOverlay" hidden></div>
