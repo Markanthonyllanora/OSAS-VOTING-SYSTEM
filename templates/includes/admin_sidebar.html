@@ -32,7 +32,7 @@
       <span class="nav-label">Result</span>
     </a>
 
-    <a href="#" class="nav-link {% if active_page == 'announcements' %}active{% endif %}" {% if active_page == 'announcements' %}aria-current="page"{% endif %} title="Announcement">
+    <a href="{% url 'announcements:admin_list' %}" class="nav-link {% if active_page == 'announcements' %}active{% endif %}" {% if active_page == 'announcements' %}aria-current="page"{% endif %} title="Announcement">
       <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg>
       <span class="nav-label">Announcement</span>
     </a>

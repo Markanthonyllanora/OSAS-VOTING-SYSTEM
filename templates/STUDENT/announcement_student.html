@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Announcements | OSAS Voting System{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'STUDENT/css/announcement.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="ann-layout">
+
+  <section class="ann-main">
+    <h1 class="ann-title">Announcements</h1>
+    <p class="ann-subtitle">Stay updated with the latest election news and important notices.</p>
+
+    {% if pinned %}
+    <a href="{% url 'announcements:detail' pinned.pk %}" class="pinned-card">
+      <div class="pinned-icon-wrap">
+        <img src="{% static 'images/megaphone.png' %}" alt="" class="pinned-icon">
+      </div>
+      <div class="pinned-body">
+        <span class="pinned-label">📌 Pinned Announcement</span>
+        <h2>{{ pinned.title }}</h2>
+        <small>{{ pinned.date_posted|date:"F j, Y" }}</small>
+        <p>{{ pinned.content|truncatechars:120 }}</p>
+      </div>
+      {% if pinned.is_important %}<span class="badge-important">IMPORTANT</span>{% endif %}
+    </a>
+    {% endif %}
+
+    <div class="ann-list-card">
+      <form method="get" class="ann-search">
+        <input type="text" name="q" value="{{ query }}" placeholder="Search">
+      </form>
+      <ul class="ann-list">
+        {% for a in announcements %}
+        <li>
+          <a href="{% url 'announcements:detail' a.pk %}">
+            <div>
+              <small>{{ a.date_posted|date:"F j, Y" }}</small>
+              <strong>{{ a.title }}</strong>
+            </div>
+            <span class="chevron">›</span>
+          </a>
+        </li>
+        {% empty %}
+        <li class="ann-empty">No announcements found.</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </section>
+
+  <aside class="ann-side">
+    <div class="side-card">
+      <h3>Election Status</h3>
+      <span class="status-pill">● Voting Open</span>
+      <h4>SSC Election</h4>
+      <p class="side-date">October 13, 2026 - October 15, 2026</p>
+      <div class="progress"><div class="progress-bar"></div></div>
+      <p class="side-note">You can now cast your vote.<br>Make your voice count!</p>
+    </div>
+
+    <div class="side-card">
+      <h3>Quick Links</h3>
+      <a href="#" class="quick-link">View Candidates <span>→</span></a>
+      <a href="#" class="quick-link">Election Guidelines <span>→</span></a>
+      <a href="#" class="quick-link">Contact OSAS <span>→</span></a>
+    </div>
+
+    <img src="{% static 'images/one-vote-banner.png' %}" alt="One Vote. Many Changes." class="side-banner">
+  </aside>
+
+</div>
+{% endblock %}
