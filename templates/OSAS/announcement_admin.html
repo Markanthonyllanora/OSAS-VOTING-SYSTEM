@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Manage Announcements | OSAS Voting System{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'STUDENT/css/announcement.css' %}">
+  <link rel="stylesheet" href="{% static 'OSAS/css/announcement_admin.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="ann-layout">
+
+  <section class="ann-main">
+    <div class="ann-header">
+      <div>
+        <h1 class="ann-title">Announcements</h1>
+        <p class="ann-subtitle">Stay updated with the latest election news and important notices.</p>
+      </div>
+      <button type="button" class="btn-create" id="openModal">
+        <svg class="plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+        <span>Create Announcement</span>
+      </button>
+    </div>
+
+    {% if pinned %}
+    <a href="{% url 'announcements:detail' pinned.pk %}" class="pinned-card">
+      <div class="pinned-icon-wrap">
+        <img src="{% static 'images/megaphone.png' %}" alt="" class="pinned-icon">
+      </div>
+      <div class="pinned-body">
+        <span class="pinned-label">📌 Pinned Announcement</span>
+        <h2>{{ pinned.title }}</h2>
+        <small>{{ pinned.date_posted|date:"F j, Y" }}</small>
+        <p>{{ pinned.content|truncatechars:120 }}</p>
+      </div>
+      {% if pinned.is_important %}<span class="badge-important">IMPORTANT</span>{% endif %}
+    </a>
+    {% endif %}
+
+    <div class="ann-list-card">
+      <form method="get" class="ann-search">
+        <input type="text" name="q" value="{{ query }}" placeholder="Search">
+      </form>
+      <ul class="ann-list">
+        {% for a in announcements %}
+        <li>
+          <a href="{% url 'announcements:detail' a.pk %}">
+            <div>
+              <small>{{ a.date_posted|date:"F j, Y" }}{% if not a.is_published %} · <em>Draft</em>{% endif %}</small>
+              <strong>{{ a.title }}</strong>
+            </div>
+            <span class="chevron">›</span>
+          </a>
+        </li>
+        {% empty %}
+        <li class="ann-empty">No announcements found.</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </section>
+
+  <aside class="ann-side">
+    <div class="side-card">
+      <h3>Election Status</h3>
+      <span class="status-pill">● Voting Open</span>
+      <h4>SSC Election</h4>
+      <p class="side-date">October 13, 2026 - October 15, 2026</p>
+      <div class="progress"><div class="progress-bar"></div></div>
+      <p class="side-note">You can now cast your vote.<br>Make your voice count!</p>
+    </div>
+
+    <div class="side-card">
+      <h3>Quick Links</h3>
+      <a href="#" class="quick-link">View Candidates <span>→</span></a>
+      <a href="#" class="quick-link">Election Guidelines <span>→</span></a>
+      <a href="#" class="quick-link">Contact OSAS <span>→</span></a>
+    </div>
+
+    <img src="{% static 'images/one-vote-banner.png' %}" alt="One Vote. Many Changes." class="side-banner">
+  </aside>
+
+</div>
+
+<div class="modal-overlay {% if show_modal %}open{% endif %}" id="modalOverlay">
+  <div class="modal-box">
+    <div class="modal-head">
+      <span>Add Announcement</span>
+      <button type="button" class="modal-x" id="closeModal">X</button>
+    </div>
+
+    <form method="post">
+      {% csrf_token %}
+      <div class="modal-body">
+
+        <label class="modal-label" for="{{ form.title.id_for_label }}">Title</label>
+        {{ form.title }}
+        {{ form.title.errors }}
+
+        <label class="modal-label" for="{{ form.content.id_for_label }}">Message</label>
+        {{ form.content }}
+        {{ form.content.errors }}
+
+        <p class="modal-label">Visibility</p>
+        <div class="radio-row">
+          {% for radio in form.visibility %}
+            <label class="radio-opt">{{ radio.tag }} {{ radio.choice_label }}</label>
+          {% endfor %}
+        </div>
+
+        <p class="modal-label light">Options</p>
+        <div class="check-row">
+          <label class="radio-opt">{{ form.is_pinned }} Pin this announcement</label>
+          <label class="radio-opt">{{ form.is_important }} Mark as important</label>
+        </div>
+
+        <p class="modal-label light">Status</p>
+        <label class="toggle">
+          {{ form.is_published }}
+          <span class="toggle-track"></span>
+          <span class="toggle-text">Publish Now</span>
+        </label>
+
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="btn-cancel" id="cancelModal">Cancel</button>
+        <button type="submit" class="btn-post">Post Announcement</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  const overlay = document.getElementById("modalOverlay");
+  document.getElementById("openModal").onclick = () => overlay.classList.add("open");
+  document.getElementById("closeModal").onclick = () => overlay.classList.remove("open");
+  document.getElementById("cancelModal").onclick = () => overlay.classList.remove("open");
+  overlay.addEventListener("click", e => { if (e.target === overlay) overlay.classList.remove("open"); });
+</script>
+{% endblock %}

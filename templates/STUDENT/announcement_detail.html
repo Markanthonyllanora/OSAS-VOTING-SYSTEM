@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ announcement.title }} | OSAS Voting System{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'STUDENT/css/announcement.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="ann-layout">
+
+  <section class="ann-main">
+    <a href="{% if user.is_staff %}{% url 'announcements:admin_list' %}{% else %}{% url 'announcements:student_list' %}{% endif %}" class="detail-back">← Back to Announcements</a>
+
+    <article class="detail-card">
+      <div class="detail-tags">
+        {% if announcement.is_pinned %}<span class="detail-pinned">📌 Pinned Announcement</span>{% endif %}
+        {% if announcement.is_important %}<span class="badge-important">IMPORTANT</span>{% endif %}
+        {% if user.is_staff and not announcement.is_published %}
+          <span class="detail-draft">Draft (not visible to students)</span>
+        {% endif %}
+      </div>
+
+      <h1 class="detail-title">{{ announcement.title }}</h1>
+      <p class="detail-date">{{ announcement.date_posted|date:"F j, Y" }}</p>
+
+      <div class="detail-body">
+        {{ announcement.content|linebreaks }}
+      </div>
+    </article>
+  </section>
+
+  <aside class="ann-side">
+    <div class="side-card">
+      <h3>Election Status</h3>
+      <span class="status-pill">● Voting Open</span>
+      <h4>SSC Election</h4>
+      <p class="side-date">October 13, 2026 - October 15, 2026</p>
+      <div class="progress"><div class="progress-bar"></div></div>
+      <p class="side-note">You can now cast your vote.<br>Make your voice count!</p>
+    </div>
+
+    <div class="side-card">
+      <h3>Quick Links</h3>
+      <a href="#" class="quick-link">View Candidates <span>→</span></a>
+      <a href="#" class="quick-link">Election Guidelines <span>→</span></a>
+      <a href="#" class="quick-link">Contact OSAS <span>→</span></a>
+    </div>
+
+    <img src="{% static 'images/one-vote-banner.png' %}" alt="One Vote. Many Changes." class="side-banner">
+  </aside>
+
+</div>
+{% endblock %}
