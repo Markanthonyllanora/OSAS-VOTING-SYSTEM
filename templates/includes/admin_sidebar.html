@@ -22,7 +22,7 @@
       <span class="nav-label">Manage Elections</span>
     </a>
 
-    <a href="#" class="nav-link {% if active_page == 'candidates' %}active{% endif %}" {% if active_page == 'candidates' %}aria-current="page"{% endif %} title="Manage Candidates">
+   <a href="{% url 'elections:manage_candidates' %}" class="nav-link {% if active_page == 'candidates' %}active{% endif %}" {% if active_page == 'candidates' %}aria-current="page"{% endif %} title="Manage Candidates">
       <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
       <span class="nav-label">Manage Candidates</span>
     </a>
