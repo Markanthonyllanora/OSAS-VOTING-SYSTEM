@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'app.dashboard',
     'app.elections',
     'app.announcements',
+    'app.manage_elections'
 ]
 
 MIDDLEWARE = [

@@ -1,0 +1,302 @@
+.election-container {
+    padding: 25px;
+    width: 100%;
+    color: #172b50;
+}
+
+.election-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 28px;
+    gap: 15px;
+}
+
+.election-header h1 {
+    margin: 0 0 7px;
+    font-size: 23px;
+    font-weight: 700;
+    color: #172b50;
+}
+
+.election-header p {
+    margin: 0;
+    font-size: 13px;
+    color: #77849a;
+}
+
+
+.create-btn,
+.save-btn {
+    background: #2864df;
+    color: white;
+    border: none;
+    padding: 11px 18px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.create-btn:hover,
+.save-btn:hover {
+    background: #1d4fb8;
+}
+
+.election-tabs {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+    border-bottom: 1px solid #dce5f1;
+    margin-bottom: 20px;
+}
+
+
+.election-tabs button {
+    background: none;
+    border: none;
+    border-top: 3px solid transparent;
+    padding: 13px 10px;
+    margin-bottom: -1px;
+    cursor: pointer;
+    color: #78869c;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.election-tabs button.active {
+    color: #2864df;
+    border-top: 3px solid #2864df;
+}
+
+.election-table-container {
+    width: 100%;
+    background: white;
+    border: 1px solid #dce5f1;
+    border-radius: 8px;
+    overflow-x: auto;
+}
+
+.election-table {
+    width: 100%;
+    min-width: 750px;
+    border-collapse: collapse;
+}
+
+.election-table th {
+    background: #eaf1fb;
+    color: #344c70;
+    font-size: 11px;
+    font-weight: 700;
+    text-align: left;
+    padding: 15px;
+    white-space: nowrap;
+}
+
+.election-table td {
+    padding: 15px;
+    font-size: 11px;
+    color: #596a84;
+    border-bottom: 1px solid #edf1f7;
+}
+
+.election-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.election-title {
+    color: #243c64 !important;
+    font-weight: 700;
+}
+
+.empty-message {
+    text-align: center !important;
+    padding: 35px !important;
+    color: #8794a8 !important;
+}
+
+
+.status {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.status.upcoming {
+    background: #fff3d6;
+    color: #a66a00;
+}
+
+.status.ongoing {
+    background: #dcf7e8;
+    color: #16834c;
+}
+
+.status.closed {
+    background: #e8edf4;
+    color: #64748b;
+}
+
+.delete-election {
+    background: #fff0f0;
+    color: #d14343;
+    border: none;
+    padding: 7px 12px;
+    border-radius: 5px;
+    font-size: 10px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.delete-election:hover {
+    background: #ffdddd;
+}
+
+
+.modal-overlay[hidden] {
+    display: none !important;
+}
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 29, 54, 0.55);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    z-index: 9999;
+}
+
+.election-modal {
+    background: white;
+    width: 100%;
+    max-width: 520px;
+    border-radius: 9px;
+    overflow: hidden;
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.2);
+}
+
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    background: #172f60;
+}
+
+.modal-header h2 {
+    margin: 0 0 5px;
+    font-size: 17px;
+    color: white;
+}
+
+.modal-header p {
+    margin: 0;
+    font-size: 11px;
+    color: #c5d4ed;
+}
+
+.close-btn {
+    border: none;
+    background: none;
+    font-size: 27px;
+    cursor: pointer;
+    color: white;
+}
+
+
+.modal-body {
+    padding: 24px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 17px;
+}
+
+.form-group label {
+    margin-bottom: 7px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #344c70;
+}
+
+.form-group input,
+.form-group textarea {
+    padding: 11px;
+    border: 1px solid #d5deeb;
+    border-radius: 5px;
+    font: inherit;
+    font-size: 12px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #2864df;
+}
+
+.date-fields {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 16px 24px;
+    border-top: 1px solid #e8edf4;
+}
+
+.cancel-btn {
+    background: #edf1f7;
+    color: #53647e;
+    border: none;
+    padding: 11px 17px;
+    border-radius: 5px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.save-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+
+@media (max-width: 650px) {
+    .election-container {
+        padding: 15px;
+    }
+
+    .election-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .election-tabs {
+        gap: 10px;
+        overflow-x: auto;
+    }
+
+    .election-tabs button {
+        white-space: nowrap;
+    }
+
+    .date-fields {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+}

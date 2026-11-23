@@ -1,0 +1,192 @@
+
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Manage Elections{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'OSAS/css/manage_elections.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="election-container">
+
+    <div class="election-header">
+        <div>
+            <h1>Manage Elections</h1>
+            <p>Manage and monitor all school elections.</p>
+        </div>
+
+        <button type="button" id="openElectionModal" class="create-btn">
+            + Create New Election
+        </button>
+    </div>
+
+    <div class="election-tabs">
+        <button type="button" class="active">Manage Elections</button>
+        <button type="button">Manage Voters</button>
+        <button type="button"
+            onclick="window.location.href='{% url 'elections:manage_candidates' %}'">
+            Manage Candidates
+        </button>
+
+    </div>
+
+    <div class="election-table-container">
+        <table class="election-table">
+            <thead>
+                <tr>
+                    <th>Election Title</th>
+                    <th>Description</th>
+                    <th>Status</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+
+            <tbody id="electionTableBody"
+                   data-delete-url-template="{% url 'delete_election' 0 %}">
+
+                {% for election in elections %}
+                <tr id="election-{{ election.id }}">
+                    <td class="election-title">
+                        {{ election.title }}
+                    </td>
+
+                    <td>{{ election.description|default:"No description" }}</td>
+
+                    <td>
+                        <span class="status {{ election.status|lower }}">
+                            {{ election.status }}
+                        </span>
+                    </td>
+
+                    <td>{{ election.start_date }}</td>
+                    <td>{{ election.end_date }}</td>
+
+                    <td>
+                        <button
+                            type="button"
+                            class="delete-election"
+                            data-delete-url="{% url 'delete_election' election.id %}">
+                            Delete
+                        </button>
+                    </td>
+                </tr>
+
+                {% empty %}
+                <tr id="emptyElectionMessage">
+                    <td colspan="6" class="empty-message">
+                        No elections available. Click Create New Election to get started.
+                    </td>
+                </tr>
+                {% endfor %}
+
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<!-- CREATE ELECTION MODAL -->
+
+<div id="electionModal" class="modal-overlay" hidden>
+
+    <div class="election-modal">
+
+        <div class="modal-header">
+            <div>
+                <h2>Create New Election</h2>
+                <p>Fill in the details below to create an election.</p>
+            </div>
+
+            <button type="button" id="closeModal" class="close-btn">
+                &times;
+            </button>
+        </div>
+
+        <form id="electionForm" action="{% url 'create_election' %}" method="POST">
+
+            {% csrf_token %}
+
+            <div class="modal-body">
+
+                <div class="form-group">
+                    <label for="electionTitle">Election Title</label>
+                    <input
+                        type="text"
+                        id="electionTitle"
+                        name="title"
+                        placeholder="Enter election title"
+                        required>
+                </div>
+
+                <div class="form-group">
+                    <label for="electionDescription">Description</label>
+                    <textarea
+                        id="electionDescription"
+                        name="description"
+                        placeholder="Enter election description"
+                        rows="3"></textarea>
+                </div>
+
+                <div class="date-fields">
+
+                    <div class="form-group">
+                        <label for="startDate">Start Date</label>
+                        <input
+                            type="date"
+                            id="startDate"
+                            name="start_date"
+                            required>
+
+                        <label for="startTime">Start Time</label>
+                        <input
+                            type="time"
+                            id="startTime"
+                            name="start_time"
+                            required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="endDate">End Date</label>
+                        <input
+                            type="date"
+                            id="endDate"
+                            name="end_date"
+                            required>
+
+                        <label for="endTime">End Time</label>
+                        <input
+                            type="time"
+                            id="endTime"
+                            name="end_time"
+                            required>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" id="cancelModal" class="cancel-btn">
+                    Cancel
+                </button>
+
+                <button type="submit" id="saveElection" class="save-btn">
+                    Save Election
+                </button>
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'OSAS/js/manage_elections.js' %}"></script>
+{% endblock %}
