@@ -1,0 +1,151 @@
+{% extends "results/base_shell.html" %}
+{% load static %}
+
+{% block title %}Election Results (Completed) — OSAS{% endblock %}
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'results/css/osas_completed.css' %}" />
+{% endblock %}
+
+{% block topbar_extra %}
+  <a href="{% url 'results:osas_ongoing' %}" class="btn">Ongoing View</a>
+{% endblock %}
+
+{% block content %}
+  <div class="header-row">
+    <div>
+      <h1 style="font-size:24px; display:flex; align-items:center; gap:10px;">
+        Election Results <span class="pill-completed">Completed</span>
+      </h1>
+      <p style="color:var(--muted); font-size:13px; margin-top:4px;">
+        Final tally and turnout for the {{ selected_election }}. Review before publishing to students.
+      </p>
+    </div>
+    <div style="display:flex; gap:10px; align-items:center;">
+      <form method="get">
+        <select name="election" class="ctrl" onchange="this.form.submit()">
+          <option value="SSCC Election" {% if selected_election == "SSCC Election" %}selected{% endif %}>SSCC Election</option>
+          <option value="College Council" {% if selected_election == "College Council" %}selected{% endif %}>College Council</option>
+        </select>
+      </form>
+      <a href="{% url 'results:export_csv' %}" class="btn">Export CSV</a>
+      <a href="{% url 'results:export_pdf' %}" class="btn btn-primary">↓ Export PDF</a>
+    </div>
+  </div>
+
+  <div class="grid-2-1">
+    <div class="card" style="display:flex; align-items:center; gap:24px; flex-wrap:wrap;">
+      <div style="width:110px; text-align:center;">
+        <canvas id="turnoutDonut" data-turnout="{{ turnout_pct }}"></canvas>
+        <div style="font-weight:700; font-size:15px; margin-top:-66px;">{{ turnout_pct }}%</div>
+        <div style="font-size:11px; color:var(--muted); margin-top:46px;">Turnout</div>
+      </div>
+      <div style="flex:1; min-width:220px;">
+        <h2 style="font-size:16px;">{{ votes_cast }} of {{ total_voters }} students voted</h2>
+        <p style="font-size:12px; color:var(--muted); margin-bottom:12px;">Voting closed. Totals below are final.</p>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;">
+          <div class="tint-blue">
+            <div style="font-size:12px; color:var(--muted);">Votes cast</div>
+            <div style="font-size:20px; font-weight:700;">{{ votes_cast }}</div>
+          </div>
+          <div class="tint-amber">
+            <div style="font-size:12px; color:var(--muted);">Did not vote</div>
+            <div style="font-size:20px; font-weight:700;">{{ did_not_vote }}</div>
+          </div>
+        </div>
+        <div class="tint-purple">
+          <div style="font-size:12px; color:var(--muted);">Positions</div>
+          <div style="font-size:18px; font-weight:700;">{{ positions_count }}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="background:var(--navy); color:#fff; display:flex; flex-direction:column; justify-content:space-between;">
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+          <h2 style="font-size:16px;">Publish results</h2>
+          <form method="post" action="{% url 'results:toggle_publish' %}">
+            {% csrf_token %}
+            <button type="submit" class="btn" style="padding:4px 10px; font-size:11px;">
+              {% if published %}Published (ON){% else %}Hidden (OFF){% endif %}
+            </button>
+          </form>
+        </div>
+        <p style="font-size:12px; color:#cbd5e1; line-height:1.5;">
+          Students can now see winners and totals on their Results page. Turn this off to hide them again.
+        </p>
+      </div>
+      <a href="{% url 'results:student_results' %}" class="btn" style="justify-content:center; margin-top:16px; background:rgba(255,255,255,.12); color:#fff; border-color:rgba(255,255,255,.2);">
+        Preview student view
+      </a>
+    </div>
+  </div>
+
+  <h2 style="font-size:16px; margin-bottom:12px;">Winners by position</h2>
+  <div class="winners-grid">
+    {% for w in winners_by_position %}
+      <div class="winner-card">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span class="avatar-sm">{{ w.initials }}</span>
+          <div>
+            <div style="font-size:10px; font-weight:700; color:var(--muted);">{{ w.position }}</div>
+            <div style="font-size:14px; font-weight:700;">{{ w.name }}</div>
+            <div style="font-size:11px; color:var(--muted);">{{ w.votes }} votes · {{ w.pct }}%</div>
+          </div>
+        </div>
+        <span class="lead-tag">{{ w.lead }}</span>
+      </div>
+    {% endfor %}
+  </div>
+
+  <div class="grid-2-1">
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+        <h2 style="font-size:16px;">Full ranking</h2>
+        <form method="get">
+          <select name="position" class="ctrl" onchange="this.form.submit()">
+            {% for pos in positions %}
+              <option value="{{ pos }}" {% if pos == selected_position %}selected{% endif %}>{{ pos }}</option>
+            {% endfor %}
+          </select>
+        </form>
+      </div>
+      {% for c in ranking %}
+        <div class="cand-row">
+          <div class="cand-top">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <span style="width:16px; color:var(--muted); font-weight:600;">{{ forloop.counter }}</span>
+              <strong>{{ c.name }}</strong>
+            </div>
+            <div>
+              <span style="color:var(--muted); margin-right:12px;">{{ c.votes }}</span>
+              <strong>{{ c.pct }}%</strong>
+            </div>
+          </div>
+          <div class="bar-bg">
+            <div class="bar-fill" style="width: {{ c.pct }}%; background: {{ c.color }};"></div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+    <div class="card">
+      <h2 style="font-size:16px;">Votes per hour</h2>
+      <p style="font-size:12px; color:var(--muted);">When students voted on election day</p>
+      <div class="hour-bars">
+        {% for h in hourly_votes %}
+          <div class="hour-col">
+            <div class="hour-val">{{ h.count }}</div>
+            <div class="hour-bar" style="height: {{ h.height }}%;"></div>
+            <div class="hour-lbl">{{ h.label }}</div>
+          </div>
+        {% endfor %}
+      </div>
+      <div class="peak-box">Peak voting was at <strong>10 AM</strong> with <strong>41 votes</strong>.</div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block extra_js %}
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="{% static 'results/js/osas_charts.js' %}"></script>
+{% endblock %}
