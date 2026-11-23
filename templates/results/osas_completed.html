@@ -1,0 +1,110 @@
+{% extends "results/base_shell.html" %}
+{% load static %}
+
+{% block title %}Election Results (Ongoing) — OSAS{% endblock %}
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'results/css/osas_ongoing.css' %}" />
+{% endblock %}
+
+{% block topbar_extra %}
+  <a href="{% url 'results:osas_completed' %}" class="btn">Completed View</a>
+{% endblock %}
+
+{% block content %}
+  <div class="header-row">
+    <div>
+      <h1 style="font-size:24px; display:flex; align-items:center; gap:10px;">
+        Election Results <span class="pill-ongoing">● Ongoing</span>
+      </h1>
+      <p style="color:var(--muted); font-size:13px; margin-top:4px;">
+        View and analyze the results of ongoing elections.
+      </p>
+    </div>
+    <div style="display:flex; gap:10px; align-items:center;">
+      <form method="get">
+        <select name="election" class="ctrl" onchange="this.form.submit()">
+          <option value="SSCC Election" {% if selected_election == "SSCC Election" %}selected{% endif %}>SSCC Election</option>
+          <option value="College Council" {% if selected_election == "College Council" %}selected{% endif %}>College Council</option>
+        </select>
+      </form>
+      <a href="{% url 'results:export_csv' %}" class="btn">↓ Export</a>
+    </div>
+  </div>
+
+  <div class="stats-3">
+    <div class="stat-card tint-blue">
+      <div class="stat-label">Total Voters</div>
+      <div class="stat-value">{{ total_voters }}</div>
+    </div>
+    <div class="stat-card tint-amber">
+      <div class="stat-label">Total Votes Cast</div>
+      <div class="stat-value">{{ votes_cast }}</div>
+      <div class="stat-sub">{{ turnout_pct }}% turnout</div>
+    </div>
+    <div class="stat-card tint-purple">
+      <div class="stat-label">Remaining Time</div>
+      <div class="stat-value">{{ remaining_time }}</div>
+      <div class="stat-sub">Until election ends</div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    {% for pos in positions %}
+      <a href="?position={{ pos|urlencode }}&election={{ selected_election|urlencode }}"
+         class="tab {% if pos == selected_position %}active{% endif %}">{{ pos }}</a>
+    {% endfor %}
+  </div>
+
+  <div class="grid-2-1">
+    <div class="card">
+      <div class="card-head">
+        <h2>{{ selected_position }} Results</h2>
+        <span>{{ votes_cast }} votes counted</span>
+      </div>
+      {% for c in candidates %}
+        <div class="cand-row">
+          <div class="cand-top">
+            <div class="cand-left">
+              <span class="avatar-sm">{{ c.initials }}</span>
+              <strong>{{ c.name }}</strong>
+              {% if c.badge %}<span class="badge-lead">{{ c.badge }}</span>{% endif %}
+            </div>
+            <div>
+              <span style="color:var(--muted); margin-right:12px;">{{ c.votes }} votes</span>
+              <strong>{{ c.pct }}%</strong>
+            </div>
+          </div>
+          <div class="bar-bg">
+            <div class="bar-fill" style="width: {{ c.pct }}%; background: {{ c.color }};"></div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:18px;">
+      <div class="card">
+        <div class="card-head"><h2>Votes by Position</h2></div>
+        <div style="max-width:190px; margin:0 auto;">
+          <canvas id="donutChart"></canvas>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h2>Recent Activity</h2></div>
+        {% for act in recent_activity %}
+          <div style="display:flex; justify-content:space-between; gap:10px; margin-bottom:12px; font-size:12px;">
+            <div>
+              <strong>{{ act.title }}</strong><br>
+              <span style="color:var(--muted);">{{ act.subtitle }}</span>
+            </div>
+            <span style="color:var(--muted); white-space:nowrap;">{{ act.time }}</span>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block extra_js %}
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="{% static 'results/js/osas_charts.js' %}"></script>
+{% endblock %}
