@@ -1,0 +1,68 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}Election Results{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'results/css/base_layout.css' %}" />
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+  <aside class="sidebar">
+    <div>
+      <div class="brand">
+        <div class="brand-badge">OSAS</div>
+        <div>
+          <strong>OSAS</strong>
+          <small>Digital Voting System</small>
+        </div>
+      </div>
+
+      {% if role == "student" %}
+        <nav class="nav">
+          <a href="#">My Profile</a>
+          <a href="#">Elections</a>
+          <a href="#">Candidates</a>
+          <a href="#">My Vote</a>
+          <a href="{% url 'results:student_results' %}" class="active">Results</a>
+        </nav>
+      {% else %}
+        <nav class="nav">
+          <a href="#">Dashboard</a>
+          <a href="#">Manage Election</a>
+          <a href="#">Candidates</a>
+          <a href="#">Voters</a>
+          <a href="{% url 'results:osas_ongoing' %}" class="active">Results</a>
+          <a href="#">Announcements</a>
+          <a href="#">Settings</a>
+        </nav>
+      {% endif %}
+    </div>
+    <a href="#" class="logout">Logout</a>
+  </aside>
+
+  <div class="main">
+    <div class="topbar">
+      {% block topbar_extra %}{% endblock %}
+      {% if role == "student" %}
+        <div class="avatar">S</div>
+        <div style="font-size: 12px;">
+          <strong>Student</strong><br><span style="color: var(--muted);">2025-0143</span>
+        </div>
+      {% else %}
+        <div class="avatar">A</div>
+        <div style="font-size: 12px;">
+          <strong>Anna</strong><br><span style="color: var(--muted);">Administrator</span>
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="content">
+      {% block content %}{% endblock %}
+    </div>
+  </div>
+
+  {% block extra_js %}{% endblock %}
+</body>
+</html>
