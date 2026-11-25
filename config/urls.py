@@ -8,6 +8,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('navigations/', include('app.dashboard.urls')),
     path('announcements/', include('app.announcements.urls')),
+    path('accounts/', include('app.accounts.urls')),
     path('', include('app.elections.urls')),
     path('manage-elections/', include('app.manage_elections.urls')),
 ]
