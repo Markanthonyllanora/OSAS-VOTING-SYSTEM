@@ -5,4 +5,5 @@ app_name = "dashboard"
 
 urlpatterns = [
     path("", views.admin_dashboard, name="admin_dashboard"),
+    path("student/", views.student_dashboard, name="student_dashboard"),
 ]

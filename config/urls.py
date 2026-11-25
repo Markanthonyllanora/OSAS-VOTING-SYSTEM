@@ -9,6 +9,7 @@ urlpatterns = [
     path('announcements/', include('app.announcements.urls')),
     path('elections/', include('app.elections.urls')),
     path('manage-elections/', include('app.manage_elections.urls')),
+    path("accounts/", include("app.accounts.urls")),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
