@@ -1,161 +1,301 @@
+
 {% extends "base.html" %}
 {% load static %}
 
 {% block title %}Manage Candidates{% endblock %}
 
 {% block extra_css %}
-  <link rel="stylesheet" href="{% static 'OSAS/css/manage_candidates.css' %}">
+<link rel="stylesheet" href="{% static 'OSAS/css/manage_candidates.css' %}">
 {% endblock %}
 
 {% block content %}
-  <div class="page-head">
-    <div>
-      <h2 class="page-title">Manage Candidates</h2>
-      <p class="page-sub">Add, edit and manage candidates for each election.</p>
+<div class="candidate-container">
+
+    <div class="page-head">
+        <div>
+            <h2 class="page-title">Manage Candidates</h2>
+            <p class="page-sub">Add, edit and manage candidates for each election.</p>
+        </div>
+        <button type="button" class="btn btn-primary" id="openCandidateDialog">
+            + Add Candidates
+        </button>
     </div>
-    <button type="button" class="btn btn-primary" id="openCandidateDialog">+ Add Candidates</button>
-  </div>
 
-  {% if messages %}
-    <ul class="messages">
-      {% for message in messages %}
-        <li class="message message-{{ message.tags }}">{{ message }}</li>
-      {% endfor %}
-    </ul>
-  {% endif %}
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li class="message message-{{ message.tags }}">
+                    {{ message }}
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
 
-  <form method="get" class="toolbar">
-    <input type="search" name="q" value="{{ q }}" placeholder="Search Candidates..." class="search-input" aria-label="Search candidates">
-    <select name="position" class="select" aria-label="Filter by position" onchange="this.form.submit()">
-      <option value="">All Positions</option>
-      {% for value, label in positions %}
-        <option value="{{ value }}" {% if value == selected_position %}selected{% endif %}>{{ label }}</option>
-      {% endfor %}
-    </select>
-  </form>
+    <form method="get" class="toolbar">
+        <input
+            type="search"
+            name="q"
+            value="{{ q }}"
+            placeholder="Search Candidates..."
+            class="search-input"
+            aria-label="Search candidates"
+        >
 
-  <div class="table-wrap">
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th>Photo</th>
-          <th>Name</th>
-          <th>Position</th>
-          <th>Election</th>
-          <th>Status</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for c in candidates %}
-          <tr>
-            <td>
-              {% if c.photo %}
-                <img src="{{ c.photo.url }}" alt="" class="cand-photo">
-              {% else %}
-                <span class="cand-photo cand-photo--empty" aria-hidden="true">{{ c.first_name|slice:":1"|upper }}</span>
-              {% endif %}
-            </td>
-            <td class="cell-strong">{{ c.full_name }}</td>
-            <td class="cell-strong">{{ c.position }}</td>
-            <td class="cell-strong">{{ c.get_election_display }}</td>
-            <td><span class="badge badge-{{ c.status }}">{{ c.get_status_display }}</span></td>
-            <td>
-              <div class="actions">
-                <a href="{% url 'elections:candidate_edit' c.pk %}" class="link-action">Edit</a>
-                <form method="post" action="{% url 'elections:candidate_delete' c.pk %}" onsubmit="return confirm('Delete {{ c.full_name|escapejs }}?');">
-                  {% csrf_token %}
-                  <button type="submit" class="link-action link-danger">Delete</button>
-                </form>
-              </div>
-            </td>
-          </tr>
-        {% empty %}
-          <tr>
-            <td colspan="6" class="empty-row">No candidates found.</td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
-
-  {# ===== Add Candidate popup ===== #}
-  <dialog class="modal" id="candidateDialog" aria-labelledby="candidateDialogTitle" {% if open_modal %}data-open="true"{% endif %}>
-    <form method="post" action="{% url 'elections:manage_candidates' %}" enctype="multipart/form-data" class="modal-card">
-      {% csrf_token %}
-
-      <div class="modal-head">
-        <h3 id="candidateDialogTitle">Candidate Details</h3>
-        <button type="button" class="modal-x" data-close aria-label="Close">X</button>
-      </div>
-
-      <div class="modal-body">
-        {# Photo picker: click the avatar to choose a photo #}
-        <label class="photo-picker" for="id_photo">
-          <span class="photo-circle">
-            <svg id="photoDefault" viewBox="0 0 80 80" aria-hidden="true"><circle cx="40" cy="30" r="14"/><path d="M12 76c0-16 12-26 28-26s28 10 28 26z"/></svg>
-            <img id="photoPreview" alt="Selected photo preview" hidden>
-          </span>
-          <span class="photo-camera" aria-hidden="true">
-            <svg viewBox="0 0 24 24"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
-          </span>
-          <span class="sr-only">Choose candidate photo</span>
-        </label>
-        <input type="file" name="photo" id="id_photo" accept="image/*" class="sr-only">
-        {% for e in form.photo.errors %}<p class="field-error">{{ e }}</p>{% endfor %}
-
-        <div class="field-row">
-          <div class="form-field">
-            <label for="{{ form.first_name.id_for_label }}">First Name</label>
-            {{ form.first_name }}
-            {% for e in form.first_name.errors %}<p class="field-error">{{ e }}</p>{% endfor %}
-          </div>
-          <div class="form-field">
-            <label for="{{ form.last_name.id_for_label }}">Last Name</label>
-            {{ form.last_name }}
-            {% for e in form.last_name.errors %}<p class="field-error">{{ e }}</p>{% endfor %}
-          </div>
-          <div class="form-field">
-            <label for="{{ form.middle_initial.id_for_label }}">M.I</label>
-            {{ form.middle_initial }}
-            {% for e in form.middle_initial.errors %}<p class="field-error">{{ e }}</p>{% endfor %}
-          </div>
-        </div>
-
-        <div class="form-field">
-          <label for="{{ form.position.id_for_label }}">Position</label>
-          {{ form.position }}
-          {% for e in form.position.errors %}<p class="field-error">{{ e }}</p>{% endfor %}
-        </div>
-
-        <div class="form-field">
-          <label for="{{ form.biography.id_for_label }}">Biography</label>
-          {{ form.biography }}
-          {% for e in form.biography.errors %}<p class="field-error">{{ e }}</p>{% endfor %}
-        </div>
-
-        <div class="field-row field-row--2">
-          <div class="form-field">
-            <label for="{{ form.election.id_for_label }}">Election</label>
-            {{ form.election }}
-            {% for e in form.election.errors %}<p class="field-error">{{ e }}</p>{% endfor %}
-          </div>
-          <div class="form-field">
-            <label for="{{ form.status.id_for_label }}">Status</label>
-            {{ form.status }}
-            {% for e in form.status.errors %}<p class="field-error">{{ e }}</p>{% endfor %}
-          </div>
-        </div>
-      </div>
-
-      <div class="modal-foot">
-        <button type="button" class="btn-sm btn-sm--gray" data-close>Close</button>
-        <button type="submit" class="btn-sm btn-sm--blue">Save Changes</button>
-      </div>
+        <select
+            name="position"
+            class="select"
+            aria-label="Filter by position"
+            onchange="this.form.submit()"
+        >
+            <option value="">All Positions</option>
+            {% for value, label in positions %}
+                <option value="{{ value }}" {% if value == selected_position %}selected{% endif %}>
+                    {{ label }}
+                </option>
+            {% endfor %}
+        </select>
     </form>
-  </dialog>
+
+    <div class="table-wrap">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Photo</th>
+                    <th>Name</th>
+                    <th>Position</th>
+                    <th>Election</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for c in candidates %}
+                    <tr>
+                        <td>
+                            {% if c.photo %}
+                                <img src="{{ c.photo.url }}" alt="" class="cand-photo">
+                            {% else %}
+                                <span class="cand-photo cand-photo--empty" aria-hidden="true">
+                                    {{ c.first_name|slice:":1"|upper }}
+                                </span>
+                            {% endif %}
+                        </td>
+
+                        <td class="cell-strong">{{ c.full_name }}</td>
+                        <td class="cell-strong">{{ c.position }}</td>
+
+                        <td class="cell-strong">
+                            {{ c.get_election_display }}
+                            {% if c.department %}
+                                - {{ c.department }}
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            <span class="badge badge-{{ c.status }}">
+                                {{ c.get_status_display }}
+                            </span>
+                        </td>
+
+                        <td>
+                            <div class="actions">
+                                <a href="{% url 'elections:candidate_edit' c.pk %}" class="link-action">
+                                    Edit
+                                </a>
+
+                                <form
+                                    method="post"
+                                    action="{% url 'elections:candidate_delete' c.pk %}"
+                                    onsubmit="return confirm('Delete {{ c.full_name|escapejs }}?');"
+                                >
+                                    {% csrf_token %}
+                                    <button type="submit" class="link-action link-danger">
+                                        Delete
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+
+                {% empty %}
+                    <tr>
+                        <td colspan="6" class="empty-row">
+                            No candidates found.
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Add Candidate Dialog -->
+    <dialog
+        class="modal"
+        id="candidateDialog"
+        aria-labelledby="candidateDialogTitle"
+        {% if open_modal %}data-open="true"{% endif %}
+    >
+        <form
+            method="post"
+            action="{% url 'elections:manage_candidates' %}"
+            enctype="multipart/form-data"
+            class="modal-card"
+        >
+            {% csrf_token %}
+
+            <div class="modal-head">
+                <h3 id="candidateDialogTitle">Candidate Details</h3>
+                <button type="button" class="modal-x" data-close aria-label="Close">
+                    X
+                </button>
+            </div>
+
+            <div class="modal-body">
+
+                {% if form.errors %}
+                    <p class="field-error">
+                        Please fix the following errors:
+                        {% for field in form %}
+                            {% for error in field.errors %}
+                                {{ field.label }} - {{ error }}.
+                            {% endfor %}
+                        {% endfor %}
+                        {{ form.non_field_errors }}
+                    </p>
+                {% endif %}
+
+                <!-- Candidate Photo -->
+                <label class="photo-picker" for="id_photo">
+                    <span class="photo-circle">
+                        <svg id="photoDefault" viewBox="0 0 80 80" aria-hidden="true">
+                            <circle cx="40" cy="30" r="14"/>
+                            <path d="M12 76c0-16 12-26 28-26s28 10 28 26z"/>
+                        </svg>
+
+                        <img id="photoPreview" alt="Selected photo preview" hidden>
+                    </span>
+
+                    <span class="photo-camera" aria-hidden="true">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/>
+                            <circle cx="12" cy="13" r="3"/>
+                        </svg>
+                    </span>
+
+                    <span class="sr-only">Choose candidate photo</span>
+                </label>
+
+                <input
+                    type="file"
+                    name="photo"
+                    id="id_photo"
+                    accept="image/*"
+                    class="sr-only"
+                >
+
+                {% for error in form.photo.errors %}
+                    <p class="field-error">{{ error }}</p>
+                {% endfor %}
+
+                <!-- Name Fields -->
+                <div class="field-row">
+                    <div class="form-field">
+                        <label for="{{ form.first_name.id_for_label }}">First Name</label>
+                        {{ form.first_name }}
+
+                        {% for error in form.first_name.errors %}
+                            <p class="field-error">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+
+                    <div class="form-field">
+                        <label for="{{ form.last_name.id_for_label }}">Last Name</label>
+                        {{ form.last_name }}
+
+                        {% for error in form.last_name.errors %}
+                            <p class="field-error">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+
+                    <div class="form-field">
+                        <label for="{{ form.middle_initial.id_for_label }}">M.I</label>
+                        {{ form.middle_initial }}
+
+                        {% for error in form.middle_initial.errors %}
+                            <p class="field-error">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Position -->
+                <div class="form-field">
+                    <label for="{{ form.position.id_for_label }}">Position</label>
+                    {{ form.position }}
+
+                    {% for error in form.position.errors %}
+                        <p class="field-error">{{ error }}</p>
+                    {% endfor %}
+                </div>
+
+                <!-- Biography -->
+                <div class="form-field">
+                    <label for="{{ form.biography.id_for_label }}">Biography</label>
+                    {{ form.biography }}
+
+                    {% for error in form.biography.errors %}
+                        <p class="field-error">{{ error }}</p>
+                    {% endfor %}
+                </div>
+
+                <!-- Election and Status -->
+                <div class="field-row field-row--2">
+                    <div class="form-field">
+                        <label for="{{ form.election.id_for_label }}">Election</label>
+                        {{ form.election }}
+
+                        {% for error in form.election.errors %}
+                            <p class="field-error">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+
+                    <div class="form-field">
+                        <label for="{{ form.status.id_for_label }}">Status</label>
+                        {{ form.status }}
+
+                        {% for error in form.status.errors %}
+                            <p class="field-error">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Department -->
+                <div class="form-field" id="departmentField" hidden>
+                    <label for="{{ form.department.id_for_label }}">Department</label>
+                    {{ form.department }}
+
+                    {% for error in form.department.errors %}
+                        <p class="field-error">{{ error }}</p>
+                    {% endfor %}
+                </div>
+
+            </div>
+
+            <div class="modal-foot">
+                <button type="button" class="btn-sm btn-sm--gray" data-close>
+                    Close
+                </button>
+
+                <button type="submit" class="btn-sm btn-sm--blue">
+                    Save Changes
+                </button>
+            </div>
+        </form>
+    </dialog>
+
+</div>
 {% endblock %}
 
 {% block extra_js %}
-  <script src="{% static 'OSAS/js/manage_candidates.js' %}"></script>
+<script src="{% static 'OSAS/js/manage_candidates.js' %}?v=2"></script>
 {% endblock %}
