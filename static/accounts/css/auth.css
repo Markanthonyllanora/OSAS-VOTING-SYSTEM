@@ -1,0 +1,108 @@
+* { box-sizing: border-box; }
+body.auth-body { margin: 0; font-family: "Nunito", "Segoe UI", Arial, sans-serif; color: #111; }
+
+.auth-split { display: grid; grid-template-columns: 1fr 1fr; min-height: 100vh; gap: 0; background: #fff; }
+.auth-art {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  background-color: transparent;
+  background-image: none;
+  background-repeat: no-repeat;
+    background-size: 104% auto;
+  background-position: center;
+  border: 0;
+  outline: 0;
+}
+.auth-panel { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 32px 40px; }
+
+.auth-card {
+  width: 100%; max-width: 470px; background: #fff; border-radius: 14px;
+  box-shadow: 0 2px 10px rgba(0,0,0,.25); padding: 28px 24px 24px;
+}
+.auth-form-wrap { width: 100%; max-width: 430px; }
+
+.auth-title { text-align: center; font-size: 22px; margin: 0; }
+.auth-sub { text-align: center; font-size: 12px; margin: 2px 0 22px; color: #333; }
+.auth-center { text-align: center; margin-top: 8px; }
+
+.auth-label { display: block; font-size: 12px; font-weight: 700; color: #333; margin: 16px 0 6px; }
+
+.auth-card input, .auth-form-wrap input {
+  width: 100%; padding: 11px 16px; font-size: 13px; font-family: inherit;
+  background: #efefef; border: 1px solid #333; border-radius: 999px;
+  box-shadow: 0 2px 3px rgba(0,0,0,.25);
+}
+.auth-card input:focus, .auth-form-wrap input:focus { outline: 2px solid #9db6ee; }
+
+.name-row { display: grid; grid-template-columns: 1fr 1fr 60px; gap: 8px; }
+.pw-wrap { position: relative; }
+.pw-wrap input { padding-right: 44px; }
+.pw-eye { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); background: none; border: 0; cursor: pointer; font-size: 15px; }
+
+.auth-links { display: flex; justify-content: space-between; align-items: center; margin: 12px 0 10px; font-size: 12px; }
+.auth-links a { color: #162b5e; text-decoration: none; }
+.auth-links a:hover { text-decoration: underline; }
+
+.btn-main {
+  background: #162b5e; color: #fff; border: 0; border-radius: 999px;
+  padding: 10px 34px; font-size: 12px; font-weight: 700; cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0,0,0,.35); margin-top: 14px;
+}
+.btn-main:hover { background: #1f3a78; }
+
+.auth-or { width: 100%; max-width: 470px; text-align: center; margin: 18px 0 14px; position: relative; color: #555; font-weight: 700; }
+.auth-or::before { content: ""; position: absolute; left: 0; right: 0; top: 50%; border-top: 1px solid #aaa; }
+.auth-or span { position: relative; background: #fff; padding: 0 12px; }
+.auth-hint { font-size: 12px; text-align: center; margin: 6px 0 14px; }
+.auth-hint a { color: #162b5e; }
+
+.role-row { display: flex; gap: 28px; }
+.role-btn {
+  display: block; text-align: center; text-decoration: none; padding: 12px 26px;
+  border-radius: 8px; font-weight: 700; font-size: 14px; border: 1px solid #aaa;
+}
+.role-student { background: #d6e2fb; color: #1e4fa3; }
+.role-admin { background: #d9e8d9; color: #2f7a2f; }
+
+.tag { display: inline-block; font-size: 11px; padding: 2px 12px; border-radius: 999px; box-shadow: 0 2px 3px rgba(0,0,0,.2); }
+.tag-student { background: #d6e2fb; color: #1e4fa3; }
+.tag-admin { background: #d9e8d9; color: #2f7a2f; }
+
+.auth-error { color: #b91c1c; font-size: 12px; margin: 4px 0 0 12px; }
+.auth-msg { background: #dcfce7; border: 1px solid #22c55e; color: #166534; font-size: 12px; padding: 8px 12px; border-radius: 8px; }
+
+@media (max-width: 800px) {
+  .auth-split { grid-template-columns: 1fr; }
+  .auth-art { display: none; }
+}
+
+.auth-card .auth-links .remember {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: auto;
+  cursor: pointer;
+  color: #162b5e;
+  font-size: 12px;
+  white-space: nowrap;
+}
+.auth-card .auth-links .remember input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+  min-width: 14px;
+  padding: 0;
+  margin: 0;
+  border: 1px solid #162b5e;
+  border-radius: 3px;
+  box-shadow: none;
+  background: #fff;
+  accent-color: #162b5e;
+  flex: 0 0 auto;
+}
+.auth-card .auth-links .remember span { display: inline; }
+
+.auth-card .name-row { grid-template-columns: 1fr 1fr; }
+
+.name-row { align-items: start; }
+.name-col { min-width: 0; }
