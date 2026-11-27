@@ -43,13 +43,17 @@
     </a>
 
     {# Logout must be a POST form in newer Django versions #}
-    <form method="post" action="#" class="nav-form">
+  <form method="post" action="{% url 'accounts:logout' %}" class="nav-form">
       {% csrf_token %}
       <button type="submit" class="nav-link nav-button" title="Logout">
-        <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
-        <span class="nav-label">Logout</span>
+          <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+              <polyline points="16 17 21 12 16 7"/>
+              <line x1="21" x2="9" y1="12" y2="12"/>
+          </svg>
+          <span class="nav-label">Logout</span>
       </button>
-    </form>
+  </form>
   </nav>
 
   <footer class="sidebar-footer">

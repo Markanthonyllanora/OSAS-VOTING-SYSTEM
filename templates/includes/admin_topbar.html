@@ -18,10 +18,12 @@
 
     <div class="account-menu" id="accountMenu" role="menu" hidden>
       <a href="#" class="account-menu-item" role="menuitem">Profile</a>
-      <form method="post" action="#">
+    <form method="post" action="{% url 'accounts:logout' %}">
         {% csrf_token %}
-        <button type="submit" class="account-menu-item" role="menuitem">Log out</button>
-      </form>
+        <button type="submit" class="account-menu-item" role="menuitem">
+            Log out
+        </button>
+    </form>
     </div>
   </div>
 </header>

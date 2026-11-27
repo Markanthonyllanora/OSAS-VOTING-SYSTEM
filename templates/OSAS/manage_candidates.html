@@ -153,18 +153,6 @@
 
             <div class="modal-body">
 
-                {% if form.errors %}
-                    <p class="field-error">
-                        Please fix the following errors:
-                        {% for field in form %}
-                            {% for error in field.errors %}
-                                {{ field.label }} - {{ error }}.
-                            {% endfor %}
-                        {% endfor %}
-                        {{ form.non_field_errors }}
-                    </p>
-                {% endif %}
-
                 <!-- Candidate Photo -->
                 <label class="photo-picker" for="id_photo">
                     <span class="photo-circle">
