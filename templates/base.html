@@ -20,15 +20,14 @@
     {% if user.is_staff %}
       {% include "includes/admin_sidebar.html" %}
     {% else %}
-      {# Student navigation comes later. Uncomment when the student files exist: #}
-      {# {% include "includes/student_sidebar.html" %} #}
+      {% include "includes/student_sidebar.html" %}
     {% endif %}
 
     <div class="app-main">
       {% if user.is_staff %}
         {% include "includes/admin_topbar.html" %}
       {% else %}
-        {# {% include "includes/student_topbar.html" %} #}
+        {% include "includes/student_topbar.html" %}
       {% endif %}
 
       <main class="app-content">

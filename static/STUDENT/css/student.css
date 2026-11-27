@@ -1,0 +1,137 @@
+/* ==========================================================
+   OSAS Voting System - Student dashboard
+   ========================================================== */
+
+.sd-layout {
+  --serif: "Crimson Pro", "Source Serif 4", Georgia, serif;
+  --sans: "Roboto", "Segoe UI", system-ui, sans-serif;
+
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 280px;
+  gap: 20px;
+  align-items: start;
+}
+.sd-main, .sd-side { min-width: 0; }
+
+.sd-layout h2, .sd-layout h3, .sd-layout h4 {
+  font-family: var(--serif);
+  color: var(--navy-900);
+  margin: 0;
+}
+.sd-layout svg { width: 1em; height: 1em; }
+
+/* ---------- Welcome banner (static/images/school.png) ---------- */
+.sd-welcome {
+  display: flex; align-items: center;
+  min-height: 100px;
+  padding: 0 32px;
+  border-radius: 4px;
+  color: var(--white);
+  background:
+    linear-gradient(90deg, rgba(26, 40, 92, 0.78), rgba(26, 40, 92, 0.72)),
+    url("../../images/school.png") center / cover no-repeat,
+    var(--navy-800);
+}
+.sd-welcome h2 {
+  color: var(--white);
+  font-size: clamp(22px, 3vw, 30px);
+  font-weight: 700;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+}
+
+/* ---------- Section head ---------- */
+.sd-section-head {
+  display: flex; justify-content: space-between; align-items: baseline;
+  margin: 18px 0 12px;
+}
+.sd-section-head h2 { font-family: var(--sans); font-size: 20px; font-weight: 700; }
+.sd-viewall { color: var(--navy-800); font-family: var(--serif); font-size: 17px; font-style: italic; text-decoration: none; }
+.sd-viewall:hover { text-decoration: underline; }
+
+/* ---------- Election cards ---------- */
+.sd-election-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 14px;
+}
+.sd-election-card {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 6px;
+  padding: 14px 16px 16px;
+  background: var(--white);
+  border: 1px solid #555b6b;
+  border-radius: 6px;
+}
+.sd-election-icon { width: 44px; height: 44px; display: block; margin-bottom: 2px; }
+.sd-layout .sd-election-icon svg { width: 100%; height: 100%; fill: currentColor; stroke: none; }
+.sd-icon--ssc, .sd-icon--generic { color: #1d3f72; }
+.sd-icon--campus { color: #3b82f6; }
+.sd-icon--department { color: #7a3f9d; }
+
+.sd-election-card h3 { font-size: 23px; font-weight: 700; line-height: 1.1; }
+.sd-election-desc { margin: 0; min-height: 2.6em; color: #666d7c; font-family: var(--serif); font-size: 16px; line-height: 1.25; }
+.sd-election-date { display: flex; gap: 5px; align-items: flex-start; margin: 4px 0 0; font-family: var(--sans); font-size: 11px; color: #111; }
+.sd-election-date svg { flex: none; margin-top: 1px; font-size: 13px; }
+
+.sd-badge {
+  padding: 0 12px;
+  border: 1px solid; border-radius: 999px;
+  font-family: var(--serif); font-size: 13px; font-weight: 700; line-height: 1.5;
+}
+.sd-badge--ongoing  { background: #cfeec9; border-color: #4caf50; color: #1d5a1c; }
+.sd-badge--upcoming { background: #bcd0f7; border-color: #4a74d4; color: #1c3f8f; }
+.sd-badge--upcoming.sd-badge--department { background: #f6bdf6; border-color: #c04fd0; color: #8a1f9a; }
+.sd-badge--closed   { background: #e5e7ee; border-color: #9aa3b8; color: #4a5164; }
+
+.sd-empty { grid-column: 1 / -1; margin: 0; padding: 20px; text-align: center; color: #6b7285; border: 1px dashed #9aa3b8; border-radius: 8px; }
+
+/* ---------- Latest announcements ---------- */
+.sd-ann { margin-top: 16px; border: 1px solid #5b95e0; border-radius: 6px; overflow: hidden; background: #fdf6f4; }
+.sd-ann-head { display: flex; align-items: center; gap: 14px; padding: 8px 16px; background: #c9d3e6; border-bottom: 1px solid #5b95e0; }
+.sd-ann-icon { width: 30px; height: 30px; object-fit: contain; }
+.sd-ann-head h2 { font-size: 24px; font-weight: 700; }
+.sd-ann-list { list-style: none; margin: 0; padding: 4px 0 8px; }
+.sd-ann-list li { margin: 0 20px; border-bottom: 1px solid #222; }
+.sd-ann-list li:last-child { border-bottom: 0; }
+.sd-ann-list a { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 0 8px; color: #111; text-decoration: none; font-family: var(--sans); }
+.sd-ann-list a:hover { background: rgba(91, 149, 224, 0.1); }
+.sd-ann-list small { display: block; margin-bottom: 4px; font-size: 11px; font-weight: 500; }
+.sd-ann-list strong { font-size: 12px; font-weight: 700; }
+.sd-ann-empty { padding: 16px 0; color: #6b7285; font-family: var(--sans); font-size: 14px; }
+.sd-chevron { font-size: 28px; font-weight: 300; color: #444; line-height: 1; }
+
+/* ---------- Right column ---------- */
+.sd-card { background: var(--white); border: 1px solid #b4bacb; border-radius: 8px; padding: 14px 16px; margin-bottom: 16px; }
+.sd-card-title { display: flex; align-items: center; gap: 8px; font-size: 22px; font-weight: 700; }
+.sd-card-title svg { font-size: 22px; }
+.sd-card h4 { margin: 10px 0 4px; font-size: 22px; font-weight: 700; }
+
+.sd-pill { display: inline-flex; align-items: center; gap: 6px; margin-top: 12px; padding: 1px 14px; border: 1px solid; border-radius: 999px; font-family: var(--serif); font-size: 14px; font-weight: 700; }
+.sd-pill i { width: 9px; height: 9px; border-radius: 50%; background: #111; }
+.sd-pill--ongoing  { background: #cfeec9; border-color: #4caf50; color: #1d3a1c; }
+.sd-pill--upcoming { background: #bcd0f7; border-color: #4a74d4; color: #1c3f8f; }
+.sd-pill--closed   { background: #e5e7ee; border-color: #9aa3b8; color: #4a5164; }
+
+.sd-status-date { margin: 0 0 8px; font-family: var(--sans); font-size: 11px; color: #111; }
+.sd-progress { height: 10px; background: #e1e4ea; border-radius: 99px; overflow: hidden; }
+.sd-progress-bar { height: 100%; border-radius: 99px; }
+.sd-progress-bar--ongoing  { background: linear-gradient(90deg, #1b7f1b, #b9dcb9); }
+.sd-progress-bar--upcoming { background: #4f7fd8; }
+.sd-progress-bar--closed   { background: #9aa3b8; }
+.sd-status-note { margin: 8px 0 0; font-family: var(--sans); font-size: 10.5px; color: #666; line-height: 1.35; }
+
+/* Quick links: header line + inset separators */
+.sd-card--links { padding: 0; border-color: #555b6b; overflow: hidden; }
+.sd-card--links .sd-card-title { padding: 10px 16px; font-size: 18px; border-bottom: 1px solid #222; font-family: var(--sans); }
+.sd-card--links .sd-card-title svg { font-size: 18px; }
+.sd-quick { display: flex; justify-content: space-between; align-items: center; margin: 0 16px; padding: 12px 12px; color: var(--navy-900); font-family: var(--serif); font-weight: 700; font-size: 17px; text-decoration: none; }
+.sd-quick + .sd-quick { border-top: 1px solid #555; }
+.sd-quick:hover { background: #f3f5fb; }
+
+.sd-banner { display: block; width: 100%; height: auto; border-radius: 8px; }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 1099px) {
+  .sd-layout { grid-template-columns: 1fr; }
+  .sd-side { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; align-items: start; }
+  .sd-side .sd-card { margin-bottom: 0; }
+}
