@@ -1,3 +1,4 @@
+from django.contrib.admin.views.decorators import staff_member_required
 from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
@@ -7,9 +8,10 @@ from .models import Election
 
 
 def format_election_date(date):
-    return date.strftime('%B %d, %Y | %I:%M %p')
+    return timezone.localtime(date).strftime('%B %d, %Y | %I:%M %p')    # (2) local time
 
 
+@staff_member_required(login_url='/accounts/login/')                     # (1) admin lang
 def manage_elections(request):
 
     elections = Election.objects.all().order_by('-created_at')
@@ -27,10 +29,13 @@ def manage_elections(request):
         })
 
     return render(request, 'OSAS/manage_elections.html', {
+        'active_page': 'elections',                                       # (4) sidebar highlight
+        'page_title': 'Manage Elections',
         'elections': election_data
     })
 
 
+@staff_member_required(login_url='/accounts/login/')                     # (1)
 @require_POST
 def create_election(request):
 
@@ -78,6 +83,13 @@ def create_election(request):
     if timezone.is_naive(end_date):
         end_date = timezone.make_aware(end_date)
 
+    # (3) bawal ang start date sa nakaraan
+    if start_date < timezone.now().replace(second=0, microsecond=0):
+        return JsonResponse({
+            'success': False,
+            'message': 'Start date and time cannot be in the past.'
+        }, status=400)
+
     if end_date <= start_date:
         return JsonResponse({
             'success': False,
@@ -105,6 +117,7 @@ def create_election(request):
     })
 
 
+@staff_member_required(login_url='/accounts/login/')                     # (1)
 @require_POST
 def delete_election(request, election_id):
 
