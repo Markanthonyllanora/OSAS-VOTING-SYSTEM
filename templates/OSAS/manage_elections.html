@@ -26,10 +26,11 @@
     <div class="election-tabs">
         <button type="button" class="active">Manage Elections</button>
         <button type="button">Manage Voters</button>
-        <button type="button"
-            onclick="window.location.href='{% url 'elections:manage_candidates' %}'">
-            Manage Candidates
-        </button>
+    <button type="button"
+        onclick="window.location.href=this.dataset.url"
+        data-url="{% url 'elections:manage_candidates' %}">
+        Manage Candidates
+    </button>
 
     </div>
 

@@ -1,4 +1,4 @@
-// Manage Candidates: Add Candidate popup + photo preview
+// Manage Candidates: Add Candidate popup + photo preview + department field
 (function () {
   "use strict";
 
@@ -9,9 +9,18 @@
   var fileInput = document.getElementById("id_photo");
   var preview = document.getElementById("photoPreview");
   var placeholder = document.getElementById("photoDefault");
+  var electionSelect = document.getElementById("id_election");
+  var departmentField = document.getElementById("departmentField");
+
+  // Show the Department dropdown only when the election is "Department"
+  function syncDepartment() {
+    if (!electionSelect || !departmentField) return;
+    departmentField.hidden = electionSelect.value !== "DEPARTMENT";
+  }
 
   function openDialog() {
     if (!dialog.open) dialog.showModal();
+    syncDepartment();
   }
 
   function closeDialog() {
@@ -28,6 +37,9 @@
   dialog.addEventListener("click", function (e) {
     if (e.target === dialog) closeDialog();
   });
+
+  if (electionSelect) electionSelect.addEventListener("change", syncDepartment);
+  syncDepartment();
 
   // Reopen automatically when the server found errors in the form
   if (dialog.dataset.open === "true") openDialog();
