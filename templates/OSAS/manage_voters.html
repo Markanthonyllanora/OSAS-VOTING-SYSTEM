@@ -1,0 +1,291 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Manage Voters{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'OSAS/css/manage_voters.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="candidate-container">
+
+    <!-- Page Header -->
+    <div class="page-head">
+        <div>
+            <h2 class="page-title">Manage Voters</h2>
+            <p class="page-sub">Add, edit and manage registered student voters.</p>
+        </div>
+
+        <button type="button" class="btn btn-primary" id="openVoterDialog">
+            + Add Voter
+        </button>
+    </div>
+
+    <!-- Messages -->
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li class="message message-{{ message.tags }}">
+                    {{ message }}
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <!-- Import Voters (CSV / Excel) -->
+    <form
+        method="post"
+        action="{% url 'elections:voter_import' %}"
+        enctype="multipart/form-data"
+        class="import-bar"
+    >
+        {% csrf_token %}
+
+        <label class="import-label" for="importFile">Import voters (CSV / Excel)</label>
+
+        <div class="import-row">
+            <input
+                type="file"
+                id="importFile"
+                name="file"
+                accept=".csv,.xlsx"
+                class="import-file"
+                required
+            >
+            <button type="submit" class="btn btn-success">Import</button>
+        </div>
+
+        <p class="import-hint">
+            Columns: Voter ID, First Name, Last Name, M.I., Department, Email, Status.
+            <a href="{% url 'elections:voter_import_template' %}">Download template</a>
+        </p>
+    </form>
+
+    <!-- Search and Filters -->
+    <form method="get" class="toolbar">
+
+        <input
+            type="search"
+            name="q"
+            value="{{ q }}"
+            placeholder="Search Voters..."
+            class="search-input"
+            aria-label="Search voters"
+        >
+
+        <select
+            name="department"
+            class="select"
+            aria-label="Filter by department"
+            onchange="this.form.submit()"
+        >
+            <option value="">All Departments</option>
+
+            {% for value, label in departments %}
+                <option value="{{ value }}"
+                    {% if value == selected_department %}selected{% endif %}>
+                    {{ label }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <select
+            name="status"
+            class="select"
+            aria-label="Filter by status"
+            onchange="this.form.submit()"
+        >
+            <option value="">All Status</option>
+
+            {% for value, label in statuses %}
+                <option value="{{ value }}"
+                    {% if value == selected_status %}selected{% endif %}>
+                    {{ label }}
+                </option>
+            {% endfor %}
+        </select>
+
+    </form>
+
+    <!-- Voters Table -->
+    <div class="table-wrap">
+        <table class="data-table">
+
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Voter ID</th>
+                    <th>Full Name</th>
+                    <th>Department</th>
+                    <th>Email</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for v in voters %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+
+                        <td class="cell-strong">
+                            {{ v.voter_id }}
+                        </td>
+
+                        <td class="cell-strong">
+                            {{ v.full_name }}
+                        </td>
+
+                        <td class="cell-strong">
+                            {{ v.get_department_display }}
+                        </td>
+
+                        <td>{{ v.email }}</td>
+
+                        <td>
+                            <span class="badge badge-{{ v.status }}">
+                                {{ v.get_status_display }}
+                            </span>
+                        </td>
+
+                        <td>
+                            <div class="actions">
+                                <a href="{% url 'elections:voter_edit' v.pk %}" class="link-action">
+                                    Edit
+                                </a>
+
+                                <form
+                                    method="post"
+                                    action="{% url 'elections:voter_delete' v.pk %}"
+                                    onsubmit="return confirm('Delete {{ v.full_name|escapejs }}?');"
+                                >
+                                    {% csrf_token %}
+                                    <button type="submit" class="link-action link-danger">
+                                        Delete
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+
+                {% empty %}
+                    <tr>
+                        <td colspan="7" class="empty-row">
+                            No voters found.
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+
+        </table>
+    </div>
+
+    <!-- Add Voter Dialog -->
+    <dialog
+        class="modal"
+        id="voterDialog"
+        aria-labelledby="voterDialogTitle"
+        {% if open_modal %}data-open="true"{% endif %}
+    >
+
+        <form
+            method="post"
+            action="{% url 'elections:manage_voters' %}"
+            class="modal-card"
+        >
+            {% csrf_token %}
+
+            <div class="modal-head">
+                <h3 id="voterDialogTitle">Voter Details</h3>
+
+                <button type="button" class="modal-x" data-close aria-label="Close">
+                    X
+                </button>
+            </div>
+
+            <div class="modal-body">
+
+                {% if form.errors %}
+                    <p class="field-error">
+                        Please fix the following errors:
+
+                        {% for field in form %}
+                            {% for error in field.errors %}
+                                {{ field.label }} - {{ error }}.
+                            {% endfor %}
+                        {% endfor %}
+
+                        {{ form.non_field_errors }}
+                    </p>
+                {% endif %}
+
+                <!-- Voter ID -->
+                <div class="form-field">
+                    <label for="{{ form.voter_id.id_for_label }}">Voter ID</label>
+                    {{ form.voter_id }}
+
+                    {% for error in form.voter_id.errors %}
+                        <p class="field-error">{{ error }}</p>
+                    {% endfor %}
+                </div>
+
+                <!-- Name Fields -->
+                <div class="field-row">
+                    <div class="form-field">
+                        <label for="{{ form.first_name.id_for_label }}">First Name</label>
+                        {{ form.first_name }}
+                    </div>
+
+                    <div class="form-field">
+                        <label for="{{ form.last_name.id_for_label }}">Last Name</label>
+                        {{ form.last_name }}
+                    </div>
+
+                    <div class="form-field">
+                        <label for="{{ form.middle_initial.id_for_label }}">M.I.</label>
+                        {{ form.middle_initial }}
+                    </div>
+                </div>
+
+                <!-- Department -->
+                <div class="form-field">
+                    <label for="{{ form.department.id_for_label }}">Department</label>
+                    {{ form.department }}
+                </div>
+
+                <!-- Email -->
+                <div class="form-field">
+                    <label for="{{ form.email.id_for_label }}">Email Address</label>
+                    {{ form.email }}
+                </div>
+
+                <!-- Status -->
+                <div class="form-field">
+                    <label for="{{ form.status.id_for_label }}">Status</label>
+                    {{ form.status }}
+                </div>
+
+            </div>
+
+            <div class="modal-foot">
+                <button type="button" class="btn-sm btn-sm--gray" data-close>
+                    Close
+                </button>
+
+                <button type="submit" name="add_voter" class="btn-sm btn-sm--blue">
+                    Save Voter
+                </button>
+            </div>
+
+        </form>
+    </dialog>
+
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'OSAS/js/manage_voters.js' %}"></script>
+{% endblock %}
