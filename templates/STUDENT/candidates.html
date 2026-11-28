@@ -1,4 +1,3 @@
-
 {% extends "base.html" %}
 {% load static %}
 
@@ -51,7 +50,12 @@
 
     {% empty %}
 
-        <p>There are currently no ongoing elections.</p>
+        <div class="no-election">
+            <div>
+                <h2>No Elections Available</h2>
+                <p>There are currently no ongoing elections. Candidates will be displayed here once an election has opened. Please check the announcements for the election schedule.</p>
+            </div>
+        </div>
 
     {% endfor %}
 

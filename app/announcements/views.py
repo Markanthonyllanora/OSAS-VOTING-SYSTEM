@@ -23,6 +23,7 @@ def student_announcements(request):
         "announcements": others,
         "query": query,
         "active_page": "announcements",
+        "page_title": "Announcements",
     })
 
 
@@ -55,6 +56,7 @@ def admin_announcements(request):
         "form": form,
         "show_modal": show_modal,
         "active_page": "announcements",
+        "page_title": "Announcements",
     })
 
 
@@ -68,4 +70,5 @@ def announcement_detail(request, pk):
     return render(request, "STUDENT/announcement_detail.html", {
         "announcement": announcement,
         "active_page": "announcements",
+        "page_title": "Announcements",
     })

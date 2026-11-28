@@ -144,3 +144,25 @@
         grid-template-columns: 1fr;
     }
 }
+
+/* ===== Centered "no elections" message ===== */
+.candidates-container .no-election {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 50vh;
+  text-align: center;
+}
+.candidates-container .no-election h2 {
+  margin: 0 0 10px;
+  font-size: 22px;
+  font-weight: 700;
+  color: #162b5e;
+}
+.candidates-container .no-election p {
+  max-width: 480px;
+  margin: 0 auto;
+  font-size: 14px;
+  line-height: 1.7;
+  color: #6b7488;
+}

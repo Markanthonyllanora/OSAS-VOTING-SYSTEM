@@ -1,4 +1,3 @@
-
 document.addEventListener("DOMContentLoaded", function () {
 
     const modal = document.getElementById("electionModal");
@@ -8,7 +7,12 @@ document.addEventListener("DOMContentLoaded", function () {
     const form = document.getElementById("electionForm");
     const tableBody = document.getElementById("electionTableBody");
     const saveButton = document.getElementById("saveElection");
+    const modalTitle = document.getElementById("modalTitle");
+    const modalSubtitle = document.getElementById("modalSubtitle");
+
     // ELECTION TYPE AND DEPARTMENT
+    const titleInput = document.getElementById("electionTitle");
+    const descriptionInput = document.getElementById("electionDescription");
     const electionTypeInput = document.getElementById("election_type");
     const departmentGroup = document.getElementById("departmentGroup");
     const departmentInput = document.getElementById("department");
@@ -18,6 +22,81 @@ document.addEventListener("DOMContentLoaded", function () {
     const startTimeInput = form.elements["start_time"];
     const endDateInput = form.elements["end_date"];
     const endTimeInput = form.elements["end_time"];
+
+    // null = creating, otherwise the edit URL of the election being edited
+    let editingUrl = null;
+    let editingRow = null;
+
+    // ===== MESSAGE POPUP (replaces alert) =====
+    function showPopup(message, type, onClose) {
+        const overlay = document.getElementById("msgPopup");
+        const box = overlay.querySelector(".msg-box");
+        const icon = document.getElementById("msgIcon");
+        const title = document.getElementById("msgTitle");
+
+        box.classList.remove("is-error", "is-success");
+
+        if (type === "error") {
+            box.classList.add("is-error");
+            icon.textContent = "!";
+            title.textContent = "Error";
+        } else if (type === "success") {
+            box.classList.add("is-success");
+            icon.textContent = "✓";
+            title.textContent = "Success";
+        } else {
+            icon.textContent = "i";
+            title.textContent = "Notice";
+        }
+
+        document.getElementById("msgText").textContent = message;
+        overlay.hidden = false;
+
+        function close() {
+            overlay.hidden = true;
+            if (typeof onClose === "function") onClose();
+        }
+
+        document.getElementById("msgOk").onclick = close;
+        document.getElementById("msgClose").onclick = close;
+    }
+
+    // ===== FIELD ERRORS =====
+    function errorLine(input) {
+        return input.closest(".form-group").querySelector(".field-error");
+    }
+
+    function setError(input, message) {
+        errorLine(input).textContent = message;
+        input.closest(".form-group").classList.add("has-error");
+    }
+
+    function clearErrors() {
+        form.querySelectorAll(".field-error").forEach(function (line) {
+            line.textContent = "";
+        });
+        form.querySelectorAll(".has-error").forEach(function (group) {
+            group.classList.remove("has-error");
+        });
+    }
+
+    // Past start date -> under the date, otherwise under the time
+    function showStartError(message) {
+        if (startDateInput.value && startDateInput.value < getToday()) {
+            setError(startDateInput, message);
+        } else {
+            setError(startTimeInput, message);
+        }
+    }
+
+    // End before start date -> under the end date, otherwise under the end time
+    function showEndError(message) {
+        if (endDateInput.value && startDateInput.value && endDateInput.value < startDateInput.value) {
+            setError(endDateInput, message);
+        } else {
+            setError(endTimeInput, message);
+        }
+    }
 
     // GET TODAY'S DATE
     function getToday() {
@@ -46,44 +125,30 @@ document.addEventListener("DOMContentLoaded", function () {
         const today = getToday();
         const currentTime = getCurrentTime();
 
-        // START DATE: DISABLE PAST DATES
         startDateInput.min = today;
 
-        // START TIME: IF TODAY IS SELECTED
         if (startDateInput.value === today) {
             startTimeInput.min = currentTime;
         } else {
             startTimeInput.removeAttribute("min");
         }
 
-        // END DATE: CANNOT BE BEFORE START DATE
         const minimumEndDate = startDateInput.value || today;
 
         endDateInput.min = minimumEndDate;
 
-        // CLEAR INVALID END DATE
-        if (
-            endDateInput.value &&
-            endDateInput.value < minimumEndDate
-        ) {
+        if (endDateInput.value && endDateInput.value < minimumEndDate) {
             endDateInput.value = "";
             endTimeInput.value = "";
         }
 
-        // END TIME: MUST BE LATER IF SAME DATE
-        if (
-            startDateInput.value &&
-            endDateInput.value === startDateInput.value
-        ) {
+        if (startDateInput.value && endDateInput.value === startDateInput.value) {
             endTimeInput.min = startTimeInput.value;
         } else {
             endTimeInput.removeAttribute("min");
         }
     }
 
-    
-
-    // UPDATE RESTRICTIONS WHEN INPUT CHANGES
     startDateInput.addEventListener("change", updateDateLimits);
     startTimeInput.addEventListener("change", updateDateLimits);
     endDateInput.addEventListener("change", updateDateLimits);
@@ -103,50 +168,85 @@ document.addEventListener("DOMContentLoaded", function () {
 
     electionTypeInput.addEventListener("change", updateDepartmentField);
 
-    // OPEN MODAL
-    openButton.addEventListener("click", function () {
-        modal.hidden = false;
-        updateDateLimits();
-    });
+    // ===== MODAL MODES =====
+    function setCreateMode() {
+        editingUrl = null;
+        editingRow = null;
+        modalTitle.textContent = "Create New Election";
+        modalSubtitle.textContent = "Fill in the details below to create an election.";
+        saveButton.textContent = "Save Election";
+    }
 
-    // CLOSE MODAL
+    function setEditMode(button) {
+        editingUrl = button.dataset.editUrl;
+        editingRow = button.closest("tr");
+        modalTitle.textContent = "Edit Election";
+        modalSubtitle.textContent = "Update the details below, then save your changes.";
+        saveButton.textContent = "Update Election";
+    }
+
     function closeModal() {
         modal.hidden = true;
         form.reset();
+        clearErrors();
+        setCreateMode();
         updateDateLimits();
         updateDepartmentField();
     }
 
+    openButton.addEventListener("click", function () {
+        form.reset();
+        clearErrors();
+        setCreateMode();
+        updateDepartmentField();
+        modal.hidden = false;
+        updateDateLimits();
+    });
+
     closeButton.addEventListener("click", closeModal);
     cancelButton.addEventListener("click", closeModal);
 
-    // CLICK OUTSIDE TO CLOSE
     modal.addEventListener("click", function (event) {
         if (event.target === modal) {
             closeModal();
         }
     });
 
-    // ESCAPE KEY TO CLOSE
     document.addEventListener("keydown", function (event) {
         if (event.key === "Escape" && !modal.hidden) {
             closeModal();
         }
     });
 
+    // OPEN THE POPUP PRE-FILLED FOR EDITING
+    function openEdit(button) {
+        form.reset();
+        clearErrors();
+        setEditMode(button);
+
+        titleInput.value = button.dataset.title || "";
+        descriptionInput.value = button.dataset.description || "";
+
+        electionTypeInput.value = button.dataset.type || "";
+        updateDepartmentField();
+        departmentInput.value = button.dataset.department || "";
+
+        startDateInput.value = button.dataset.startDate || "";
+        startTimeInput.value = button.dataset.startTime || "";
+        endDateInput.value = button.dataset.endDate || "";
+        endTimeInput.value = button.dataset.endTime || "";
+
+        updateDateLimits();
+        modal.hidden = false;
+    }
+
     // GET CSRF TOKEN
     function getCSRFToken() {
         return form.querySelector('[name="csrfmiddlewaretoken"]').value;
     }
 
-    // ADD ELECTION TO TABLE
-    function addElection(election) {
-
-        const emptyMessage = document.getElementById("emptyElectionMessage");
-
-        if (emptyMessage) {
-            emptyMessage.remove();
-        }
+    // ===== TABLE ROWS =====
+    function buildRow(election) {
 
         const row = document.createElement("tr");
         row.id = "election-" + election.id;
@@ -166,10 +266,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const statusCell = document.createElement("td");
         const status = document.createElement("span");
-
         status.className = "status " + election.status.toLowerCase();
         status.textContent = election.status;
-
         statusCell.appendChild(status);
 
         const startCell = document.createElement("td");
@@ -179,20 +277,40 @@ document.addEventListener("DOMContentLoaded", function () {
         endCell.textContent = election.end_date;
 
         const actionsCell = document.createElement("td");
-        const deleteButton = document.createElement("button");
 
+        // EDIT BUTTON
+        const editButton = document.createElement("button");
+        editButton.type = "button";
+        editButton.className = "edit-election";
+        editButton.textContent = "Edit";
+
+        if (election.can_edit) {
+            editButton.dataset.editUrl = tableBody.dataset.editUrlTemplate.replace(
+                "/0/", "/" + election.id + "/"
+            );
+            editButton.dataset.title = election.title;
+            editButton.dataset.description = election.description || "";
+            editButton.dataset.type = election.election_type_value;
+            editButton.dataset.department = election.department || "";
+            editButton.dataset.startDate = election.start_date_raw;
+            editButton.dataset.startTime = election.start_time_raw;
+            editButton.dataset.endDate = election.end_date_raw;
+            editButton.dataset.endTime = election.end_time_raw;
+        } else {
+            editButton.disabled = true;
+            editButton.title = "Only upcoming elections can be edited";
+        }
+
+        // DELETE BUTTON
+        const deleteButton = document.createElement("button");
         deleteButton.type = "button";
         deleteButton.className = "delete-election";
         deleteButton.textContent = "Delete";
-
-        const urlTemplate = tableBody.dataset.deleteUrlTemplate;
-
-        deleteButton.dataset.deleteUrl = urlTemplate.replace(
-            "/0/",
-            "/" + election.id + "/"
+        deleteButton.dataset.deleteUrl = tableBody.dataset.deleteUrlTemplate.replace(
+            "/0/", "/" + election.id + "/"
         );
 
-        actionsCell.appendChild(deleteButton);
+        actionsCell.append(editButton, " ", deleteButton);
 
         row.append(
             titleCell,
@@ -205,48 +323,102 @@ document.addEventListener("DOMContentLoaded", function () {
             actionsCell
         );
 
-        tableBody.appendChild(row);
+        return row;
     }
 
-    // CREATE ELECTION
+    function addElection(election) {
+        const emptyMessage = document.getElementById("emptyElectionMessage");
+
+        if (emptyMessage) {
+            emptyMessage.remove();
+        }
+
+        tableBody.appendChild(buildRow(election));
+    }
+
+    // ===== VALIDATION (browser side) =====
+    function validateForm() {
+
+        clearErrors();
+        let valid = true;
+
+        if (!titleInput.value.trim()) {
+            setError(titleInput, "Please enter an election title.");
+            valid = false;
+        }
+
+        if (!electionTypeInput.value) {
+            setError(electionTypeInput, "Please select an election type.");
+            valid = false;
+        }
+
+        if (electionTypeInput.value === "DEPARTMENT" && !departmentInput.value) {
+            setError(departmentInput, "Please select a department.");
+            valid = false;
+        }
+
+        if (!startDateInput.value) { setError(startDateInput, "Please choose a start date."); valid = false; }
+        if (!startTimeInput.value) { setError(startTimeInput, "Please choose a start time."); valid = false; }
+        if (!endDateInput.value) { setError(endDateInput, "Please choose an end date."); valid = false; }
+        if (!endTimeInput.value) { setError(endTimeInput, "Please choose an end time."); valid = false; }
+
+        if (!valid) {
+            return false;
+        }
+
+        const start = new Date(startDateInput.value + "T" + startTimeInput.value);
+        const end = new Date(endDateInput.value + "T" + endTimeInput.value);
+        const now = new Date();
+        now.setSeconds(0, 0);
+
+        if (start < now) {
+            showStartError("Start date and time cannot be in the past.");
+            return false;
+        }
+
+        if (end <= start) {
+            showEndError("End date and time must be later than the start.");
+            return false;
+        }
+
+        return true;
+    }
+
+    // Show an error the server sent, under the right field
+    function showServerError(data) {
+        clearErrors();
+
+        switch (data.field) {
+            case "title": setError(titleInput, data.message); return;
+            case "election_type": setError(electionTypeInput, data.message); return;
+            case "department": setError(departmentInput, data.message); return;
+            case "start": showStartError(data.message); return;
+            case "end": showEndError(data.message); return;
+        }
+
+        showPopup(data.message || "Unable to save election.", "error");
+    }
+
+    // ===== CREATE OR UPDATE =====
     form.addEventListener("submit", async function (event) {
 
         event.preventDefault();
 
         updateDateLimits();
 
-        const startDate = startDateInput.value;
-        const startTime = startTimeInput.value;
-
-        const endDate = endDateInput.value;
-        const endTime = endTimeInput.value;
-
-        if (!startDate || !startTime || !endDate || !endTime) {
-            alert("Please complete all date and time fields.");
+        if (!validateForm()) {
             return;
         }
 
-        const start = new Date(startDate + "T" + startTime);
-        const end = new Date(endDate + "T" + endTime);
-        const now = new Date();
-
-        // CHECK PAST START DATE
-        if (start < now) {
-            alert("Start date and time cannot be in the past.");
-            return;
-        }
-
-        // CHECK END DATE
-        if (end <= start) {
-            alert("End date and time must be later than the start date and time.");
-            return;
-        }
+        const isEdit = editingUrl !== null;
+        const url = isEdit ? editingUrl : form.action;
+        const rowToReplace = editingRow;
 
         saveButton.disabled = true;
 
         try {
 
-            const response = await fetch(form.action, {
+            const response = await fetch(url, {
                 method: "POST",
                 body: new FormData(form),
                 headers: {
@@ -257,20 +429,24 @@ document.addEventListener("DOMContentLoaded", function () {
             const data = await response.json();
 
             if (!response.ok || !data.success) {
-                alert(data.message || "Unable to save election.");
+                showServerError(data);
                 return;
             }
 
-            addElection(data.election);
+            if (isEdit && rowToReplace) {
+                rowToReplace.replaceWith(buildRow(data.election));
+            } else {
+                addElection(data.election);
+            }
 
             closeModal();
 
-            alert(data.message);
+            showPopup(data.message, "success");
 
         } catch (error) {
 
-            console.error("Create error:", error);
-            alert("Unable to connect to the server.");
+            console.error("Save error:", error);
+            showPopup("Unable to connect to the server.", "error");
 
         } finally {
 
@@ -279,8 +455,17 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-    // DELETE ELECTION
+    // ===== EDIT AND DELETE BUTTONS =====
     tableBody.addEventListener("click", async function (event) {
+
+        const editButton = event.target.closest(".edit-election");
+
+        if (editButton) {
+            if (!editButton.disabled) {
+                openEdit(editButton);
+            }
+            return;
+        }
 
         const button = event.target.closest(".delete-election");
 
@@ -304,7 +489,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const data = await response.json();
 
             if (!response.ok || !data.success) {
-                alert(data.message || "Unable to delete election.");
+                showPopup(data.message || "Unable to delete election.", "error");
                 return;
             }
 
@@ -314,19 +499,19 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 tableBody.innerHTML = `
                     <tr id="emptyElectionMessage">
-                        <td colspan="6" class="empty-message">
+                        <td colspan="8" class="empty-message">
                             No elections available. Click Create New Election to get started.
                         </td>
                     </tr>
                 `;
             }
 
-            alert(data.message);
+            showPopup(data.message, "success");
 
         } catch (error) {
 
             console.error("Delete error:", error);
-            alert("Unable to connect to the server.");
+            showPopup("Unable to connect to the server.", "error");
 
         }
 
