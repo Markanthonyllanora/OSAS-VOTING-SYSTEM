@@ -13,4 +13,5 @@ urlpatterns = [
     path("voters/import/template/", views.voter_import_template, name="voter_import_template"),
     path("voters/<int:pk>/edit/", views.voter_edit, name="voter_edit"),
     path("voters/<int:pk>/delete/", views.voter_delete, name="voter_delete"),
+    path("STUDENT/candidates/", views.student_candidates, name="student_candidates"),
 ]

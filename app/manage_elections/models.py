@@ -3,8 +3,40 @@ from django.db import models
 
 
 class Election(models.Model):
+
+    ELECTION_CHOICES = [
+        ("SSC", "SSC"),
+        ("CAMPUS", "Campus"),
+        ("DEPARTMENT", "Department"),
+    ]
+
+    DEPARTMENT_CHOICES = [
+        ("ABELS", "ABELS"),
+        ("BSA", "BSA"),
+        ("BSAIS", "BSAIS"),
+        ("BSE", "BSE"),
+        ("BSIT", "BSIT"),
+        ("BSPA", "BSPA"),
+        ("BSSW", "BSSW"),
+        ("BTVTEd", "BTVTEd"),
+        ("DHRS", "DHRS"),
+    ]
+
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True)
+
+    election_type = models.CharField(
+        max_length=20,
+        choices=ELECTION_CHOICES,
+        default="SSC"
+    )
+
+    department = models.CharField(
+        max_length=30,
+        choices=DEPARTMENT_CHOICES,
+        blank=True
+    )
+
     start_date = models.DateTimeField()
     end_date = models.DateTimeField()
     created_at = models.DateTimeField(auto_now_add=True)

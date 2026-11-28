@@ -1,3 +1,4 @@
+
 document.addEventListener("DOMContentLoaded", function () {
 
     const modal = document.getElementById("electionModal");
@@ -7,16 +8,113 @@ document.addEventListener("DOMContentLoaded", function () {
     const form = document.getElementById("electionForm");
     const tableBody = document.getElementById("electionTableBody");
     const saveButton = document.getElementById("saveElection");
+    // ELECTION TYPE AND DEPARTMENT
+    const electionTypeInput = document.getElementById("election_type");
+    const departmentGroup = document.getElementById("departmentGroup");
+    const departmentInput = document.getElementById("department");
+
+    // DATE AND TIME INPUTS
+    const startDateInput = form.elements["start_date"];
+    const startTimeInput = form.elements["start_time"];
+    const endDateInput = form.elements["end_date"];
+    const endTimeInput = form.elements["end_time"];
+
+    // GET TODAY'S DATE
+    function getToday() {
+        const today = new Date();
+
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, "0");
+        const day = String(today.getDate()).padStart(2, "0");
+
+        return `${year}-${month}-${day}`;
+    }
+
+    // GET CURRENT TIME
+    function getCurrentTime() {
+        const now = new Date();
+
+        const hours = String(now.getHours()).padStart(2, "0");
+        const minutes = String(now.getMinutes()).padStart(2, "0");
+
+        return `${hours}:${minutes}`;
+    }
+
+    // DATE PICKER RESTRICTIONS
+    function updateDateLimits() {
+
+        const today = getToday();
+        const currentTime = getCurrentTime();
+
+        // START DATE: DISABLE PAST DATES
+        startDateInput.min = today;
+
+        // START TIME: IF TODAY IS SELECTED
+        if (startDateInput.value === today) {
+            startTimeInput.min = currentTime;
+        } else {
+            startTimeInput.removeAttribute("min");
+        }
+
+        // END DATE: CANNOT BE BEFORE START DATE
+        const minimumEndDate = startDateInput.value || today;
+
+        endDateInput.min = minimumEndDate;
+
+        // CLEAR INVALID END DATE
+        if (
+            endDateInput.value &&
+            endDateInput.value < minimumEndDate
+        ) {
+            endDateInput.value = "";
+            endTimeInput.value = "";
+        }
+
+        // END TIME: MUST BE LATER IF SAME DATE
+        if (
+            startDateInput.value &&
+            endDateInput.value === startDateInput.value
+        ) {
+            endTimeInput.min = startTimeInput.value;
+        } else {
+            endTimeInput.removeAttribute("min");
+        }
+    }
+
+    
+
+    // UPDATE RESTRICTIONS WHEN INPUT CHANGES
+    startDateInput.addEventListener("change", updateDateLimits);
+    startTimeInput.addEventListener("change", updateDateLimits);
+    endDateInput.addEventListener("change", updateDateLimits);
+
+    // SHOW DEPARTMENT ONLY FOR DEPARTMENT ELECTIONS
+    function updateDepartmentField() {
+
+        if (electionTypeInput.value === "DEPARTMENT") {
+            departmentGroup.style.display = "block";
+            departmentInput.required = true;
+        } else {
+            departmentGroup.style.display = "none";
+            departmentInput.required = false;
+            departmentInput.value = "";
+        }
+    }
+
+    electionTypeInput.addEventListener("change", updateDepartmentField);
 
     // OPEN MODAL
     openButton.addEventListener("click", function () {
         modal.hidden = false;
+        updateDateLimits();
     });
 
     // CLOSE MODAL
     function closeModal() {
         modal.hidden = true;
         form.reset();
+        updateDateLimits();
+        updateDepartmentField();
     }
 
     closeButton.addEventListener("click", closeModal);
@@ -60,6 +158,12 @@ document.addEventListener("DOMContentLoaded", function () {
         const descriptionCell = document.createElement("td");
         descriptionCell.textContent = election.description || "No description";
 
+        const typeCell = document.createElement("td");
+        typeCell.textContent = election.election_type;
+
+        const departmentCell = document.createElement("td");
+        departmentCell.textContent = election.department || "—";
+
         const statusCell = document.createElement("td");
         const status = document.createElement("span");
 
@@ -93,6 +197,8 @@ document.addEventListener("DOMContentLoaded", function () {
         row.append(
             titleCell,
             descriptionCell,
+            typeCell,
+            departmentCell,
             statusCell,
             startCell,
             endCell,
@@ -107,15 +213,30 @@ document.addEventListener("DOMContentLoaded", function () {
 
         event.preventDefault();
 
-        const startDate = form.elements["start_date"].value;
-        const startTime = form.elements["start_time"].value;
+        updateDateLimits();
 
-        const endDate = form.elements["end_date"].value;
-        const endTime = form.elements["end_time"].value;
+        const startDate = startDateInput.value;
+        const startTime = startTimeInput.value;
+
+        const endDate = endDateInput.value;
+        const endTime = endTimeInput.value;
+
+        if (!startDate || !startTime || !endDate || !endTime) {
+            alert("Please complete all date and time fields.");
+            return;
+        }
 
         const start = new Date(startDate + "T" + startTime);
         const end = new Date(endDate + "T" + endTime);
+        const now = new Date();
 
+        // CHECK PAST START DATE
+        if (start < now) {
+            alert("Start date and time cannot be in the past.");
+            return;
+        }
+
+        // CHECK END DATE
         if (end <= start) {
             alert("End date and time must be later than the start date and time.");
             return;
@@ -208,6 +329,10 @@ document.addEventListener("DOMContentLoaded", function () {
             alert("Unable to connect to the server.");
 
         }
+
     });
+
+    // INITIALIZE DATE RESTRICTIONS
+    updateDateLimits();
 
 });

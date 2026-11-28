@@ -1,0 +1,56 @@
+
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Edit Candidate{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'OSAS/css/manage_candidates.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="candidate-container">
+
+    <div class="page-head">
+        <div>
+            <h2 class="page-title">Edit Candidate</h2>
+            <p class="page-sub">Update candidate information.</p>
+        </div>
+    </div>
+
+    <form method="post" enctype="multipart/form-data" class="modal-card">
+        {% csrf_token %}
+
+        <div class="modal-body">
+
+            {% for field in form %}
+                <div class="form-field">
+                    <label for="{{ field.id_for_label }}">
+                        {{ field.label }}
+                    </label>
+
+                    {{ field }}
+
+                    {% for error in field.errors %}
+                        <p class="field-error">{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+
+            <div class="modal-foot">
+                <a href="{% url 'elections:manage_candidates' %}"
+                   class="btn-sm btn-sm--gray">
+                    Cancel
+                </a>
+
+                <button type="submit" class="btn-sm btn-sm--blue">
+                    Save Changes
+                </button>
+            </div>
+
+        </div>
+    </form>
+
+</div>
+{% endblock %}
+

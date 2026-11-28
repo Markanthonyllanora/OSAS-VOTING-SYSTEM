@@ -10,8 +10,9 @@ from .forms import LoginForm, RegisterForm, ForgotPasswordForm, ResetPasswordFor
 User = get_user_model()
 
 def _home_for(user):
-    if user.is_staff:
+    if user.is_superuser:
         return reverse("dashboard:admin_dashboard")
+
     return reverse("dashboard:student_dashboard")
 
 
@@ -31,20 +32,24 @@ def login_view(request):
 
     return render(request, "accounts/login.html", {"form": form})
 
-def register_view(request, role):
-    if role not in ("student", "admin"):
+def register_view(request, role="student"):
+    if role != "student":
         return redirect("accounts:login")
 
     form = RegisterForm(request.POST or None)
+
     if request.method == "POST" and form.is_valid():
-        form.save(role)
-        if role == "admin":
-            messages.success(request, "Admin account created. A superuser must activate it first.")
-        else:
-            messages.success(request, "Account created. You can log in now.")
+        form.save("student")
+        messages.success(
+            request,
+            "Student account created. You can log in now."
+        )
         return redirect("accounts:login")
 
-    return render(request, "accounts/register.html", {"form": form, "role": role})
+    return render(request, "accounts/register.html", {
+        "form": form,
+        "role": "student"
+    })
 
 
 @require_POST

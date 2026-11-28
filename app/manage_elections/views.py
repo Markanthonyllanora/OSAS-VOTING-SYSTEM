@@ -23,6 +23,8 @@ def manage_elections(request):
             'id': election.id,
             'title': election.title,
             'description': election.description,
+            'election_type': election.get_election_type_display(),
+            'department': election.department,
             'start_date': format_election_date(election.start_date),
             'end_date': format_election_date(election.end_date),
             'status': election.get_status(),
@@ -42,11 +44,29 @@ def create_election(request):
     title = request.POST.get('title', '').strip()
     description = request.POST.get('description', '').strip()
 
+    election_type = request.POST.get('election_type', '')
+    department = request.POST.get('department', '')
+
     start_date_value = request.POST.get('start_date', '')
     start_time_value = request.POST.get('start_time', '')
 
     end_date_value = request.POST.get('end_date', '')
     end_time_value = request.POST.get('end_time', '')
+
+    if election_type not in ["SSC", "CAMPUS", "DEPARTMENT"]:
+        return JsonResponse({
+            'success': False,
+            'message': 'Please select an election type.'
+        }, status=400)
+
+    if election_type == "DEPARTMENT":
+        if department not in dict(Election.DEPARTMENT_CHOICES):
+            return JsonResponse({
+                'success': False,
+                'message': 'Please select a valid department.'
+            }, status=400)
+    else:
+        department = ""
 
     if not all([
         title,
@@ -77,6 +97,8 @@ def create_election(request):
             'message': 'Invalid date or time.'
         }, status=400)
 
+
+
     if timezone.is_naive(start_date):
         start_date = timezone.make_aware(start_date)
 
@@ -99,6 +121,8 @@ def create_election(request):
     election = Election.objects.create(
         title=title,
         description=description,
+        election_type=election_type,
+        department=department,
         start_date=start_date,
         end_date=end_date
     )
@@ -110,6 +134,8 @@ def create_election(request):
             'id': election.id,
             'title': election.title,
             'description': election.description,
+            'election_type': election.get_election_type_display(),
+            'department': election.department,
             'start_date': format_election_date(election.start_date),
             'end_date': format_election_date(election.end_date),
             'status': election.get_status(),

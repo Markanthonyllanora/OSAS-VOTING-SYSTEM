@@ -1,10 +1,11 @@
+
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Create Account | OSAS Voting System</title>
+  <title>Create Student Account | OSAS Voting System</title>
   <link rel="stylesheet" href="{% static 'accounts/css/auth.css' %}">
 </head>
 <body class="auth-body">
@@ -14,50 +15,75 @@
 
     <div class="auth-panel">
       <div class="auth-form-wrap">
+
         <h1 class="auth-title">Create Account</h1>
+
         <div class="auth-center">
-          {% if role == "admin" %}
-            <span class="tag tag-admin">OSAS ADMIN</span>
-          {% else %}
-            <span class="tag tag-student">Student Voter</span>
-          {% endif %}
+          <span class="tag tag-student">Student Voter</span>
         </div>
 
         <form method="post" novalidate>
           {% csrf_token %}
 
-          <label class="auth-label">{% if role == "admin" %}ADMIN ID{% else %}STUDENT ID NUMBER{% endif %}</label>
+          <label class="auth-label">STUDENT ID NUMBER</label>
           {{ form.id_number }}
-          {% for e in form.id_number.errors %}<p class="auth-error">{{ e }}</p>{% endfor %}
+          {% for e in form.id_number.errors %}
+            <p class="auth-error">{{ e }}</p>
+          {% endfor %}
 
-          <label class="auth-label">{% if role == "admin" %}NAME{% else %}STUDENT NAME{% endif %}</label>
+          <label class="auth-label">STUDENT NAME</label>
           <div class="name-row">
-            {{ form.first_name }}{{ form.last_name }}{{ form.middle_initial }}
+            {{ form.first_name }}
+            {{ form.last_name }}
+            {{ form.middle_initial }}
           </div>
-          {% for e in form.first_name.errors %}<p class="auth-error">{{ e }}</p>{% endfor %}
-          {% for e in form.last_name.errors %}<p class="auth-error">{{ e }}</p>{% endfor %}
+
+          {% for e in form.first_name.errors %}
+            <p class="auth-error">{{ e }}</p>
+          {% endfor %}
+
+          {% for e in form.last_name.errors %}
+            <p class="auth-error">{{ e }}</p>
+          {% endfor %}
 
           <label class="auth-label">PASSWORD</label>
           <div class="pw-wrap">
             {{ form.password1 }}
-            <button type="button" class="pw-eye" data-target="{{ form.password1.id_for_label }}" aria-label="Show password">👁</button>
+            <button type="button" class="pw-eye"
+              data-target="{{ form.password1.id_for_label }}"
+              aria-label="Show password">👁</button>
           </div>
-          {% for e in form.password1.errors %}<p class="auth-error">{{ e }}</p>{% endfor %}
+
+          {% for e in form.password1.errors %}
+            <p class="auth-error">{{ e }}</p>
+          {% endfor %}
 
           <label class="auth-label">CONFIRM PASSWORD</label>
           <div class="pw-wrap">
             {{ form.password2 }}
-            <button type="button" class="pw-eye" data-target="{{ form.password2.id_for_label }}" aria-label="Show password">👁</button>
+            <button type="button" class="pw-eye"
+              data-target="{{ form.password2.id_for_label }}"
+              aria-label="Show password">👁</button>
           </div>
-          {% for e in form.password2.errors %}<p class="auth-error">{{ e }}</p>{% endfor %}
 
-          <div class="auth-center"><button type="submit" class="btn-main">CREATE ACCOUNT</button></div>
-          <p class="auth-hint"><a href="{% url 'accounts:login' %}">← Back to log in</a></p>
+          {% for e in form.password2.errors %}
+            <p class="auth-error">{{ e }}</p>
+          {% endfor %}
+
+          <div class="auth-center">
+            <button type="submit" class="btn-main">CREATE ACCOUNT</button>
+          </div>
+
+          <p class="auth-hint">
+            <a href="{% url 'accounts:login' %}">← Back to log in</a>
+          </p>
+
         </form>
       </div>
     </div>
 
   </div>
+
   <script src="{% static 'accounts/js/auth.js' %}"></script>
 </body>
 </html>

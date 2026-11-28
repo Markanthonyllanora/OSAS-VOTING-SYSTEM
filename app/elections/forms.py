@@ -1,6 +1,8 @@
 from django import forms
+from app.manage_elections.models import Election
 
 from .models import Candidate, Voter
+
 
 
 class CandidateForm(forms.ModelForm):
@@ -8,27 +10,41 @@ class CandidateForm(forms.ModelForm):
         model = Candidate
         fields = [
             "first_name", "last_name", "middle_initial",
-            "position", "election", "department", "status", "biography", "photo",
+            "position", "party_name", "slogan",
+            "election", "department", "status",
+            "biography", "photo",
         ]
-        labels = {"middle_initial": "M.I"}
+        labels = {"middle_initial": "M.I."}
         widgets = {"biography": forms.Textarea(attrs={"rows": 5})}
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Placeholder option shown first in the dropdowns
-        self.fields["position"].choices = [("", "Select Position")] + list(Candidate.POSITION_CHOICES)
-        self.fields["election"].choices = [("", "Select Election")] + list(Candidate.ELECTION_CHOICES)
-        self.fields["department"].choices = [("", "Select Department")] + list(Candidate.DEPARTMENT_CHOICES)
+
+        self.fields["position"].choices = [
+            ("", "Select Position")
+        ] + list(Candidate.POSITION_CHOICES)
+
+        self.fields["election"].choices = [
+            ("", "Select Election Type")
+        ] + list(Candidate.ELECTION_CHOICES)
+
+        self.fields["department"].choices = [
+            ("", "Select Department")
+        ] + list(Candidate.DEPARTMENT_CHOICES)
+
         self.fields["department"].required = False
 
     def clean(self):
         cleaned = super().clean()
+
         if cleaned.get("election") == "DEPARTMENT":
             if not cleaned.get("department"):
                 self.add_error("department", "Please select a department.")
         else:
-            cleaned["department"] = ""  # only Department elections use this field
+            cleaned["department"] = ""
+
         return cleaned
+
 
 
 class VoterForm(forms.ModelForm):

@@ -35,6 +35,8 @@ class Candidate(models.Model):
     last_name = models.CharField(max_length=60)
     middle_initial = models.CharField(max_length=2, blank=True)
     position = models.CharField(max_length=50, choices=POSITION_CHOICES)
+    party_name = models.CharField(max_length=100)
+    slogan = models.CharField(max_length=255)
     election = models.CharField(max_length=20, choices=ELECTION_CHOICES)
     department = models.CharField(max_length=30, choices=DEPARTMENT_CHOICES, blank=True)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="active")
@@ -83,3 +85,41 @@ class Voter(models.Model):
 
     def __str__(self):
         return f"{self.voter_id} - {self.full_name}"
+
+
+class Vote(models.Model):
+    voter = models.ForeignKey(
+        Voter,
+        on_delete=models.CASCADE,
+        related_name="votes"
+    )
+
+    election = models.ForeignKey(
+        "manage_elections.Election",
+        on_delete=models.CASCADE,
+        related_name="votes"
+    )
+
+    candidate = models.ForeignKey(
+        Candidate,
+        on_delete=models.CASCADE,
+        related_name="votes"
+    )
+
+    position = models.CharField(
+        max_length=50,
+        choices=Candidate.POSITION_CHOICES
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["voter", "election", "position"],
+                name="unique_vote_per_position_per_election"
+            )
+        ]
+
+    def __str__(self):
+        return f"{self.voter.voter_id} - {self.candidate.full_name}"

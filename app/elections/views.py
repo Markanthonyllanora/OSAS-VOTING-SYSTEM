@@ -4,6 +4,10 @@ from django.db.models import Q
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
+from django.contrib.auth.decorators import login_required
+from django.utils import timezone
+
+from app.manage_elections.models import Election
 
 from .forms import CandidateForm, VoterForm
 from .importers import TEMPLATE_HEADER, TEMPLATE_ROWS, import_voters
@@ -178,3 +182,73 @@ def voter_import_template(request):
     writer.writerow(TEMPLATE_HEADER)
     writer.writerows(TEMPLATE_ROWS)
     return response
+
+
+@login_required(login_url="/accounts/login/")
+def student_candidates(request):
+
+    # Find the logged-in student
+    try:
+        voter = Voter.objects.get(
+            voter_id=request.user.username,
+            status="active"
+        )
+    except Voter.DoesNotExist:
+        messages.error(request, "Your voter account was not found.")
+        return redirect("/")
+
+    now = timezone.now()
+
+    # Get ongoing elections
+    elections = Election.objects.filter(
+        start_date__lte=now,
+        end_date__gte=now
+    )
+
+    election_sections = []
+
+    for election in elections:
+
+        # Get active candidates for this election type
+        candidates = Candidate.objects.filter(
+            election=election.election_type,
+            status="active"
+        )
+
+        # Check department election
+        if election.election_type == "DEPARTMENT":
+
+            # Only show the election to its assigned department
+            if election.department != voter.department:
+                continue
+
+            # Only get candidates from the student's department
+            candidates = candidates.filter(
+                department=voter.department
+            )
+
+        positions = []
+
+        # Group candidates by position
+        for position_value, position_label in Candidate.POSITION_CHOICES:
+
+            position_candidates = candidates.filter(
+                position=position_value
+            )
+
+            if position_candidates.exists():
+                positions.append({
+                    "name": position_label,
+                    "candidates": position_candidates
+                })
+
+        election_sections.append({
+            "election": election,
+            "positions": positions
+        })
+
+    return render(request, "STUDENT/candidates.html", {
+        "election_sections": election_sections,
+        "voter": voter,
+        "page_title": "Candidates"
+    })

@@ -1,0 +1,146 @@
+
+/* Student Candidates Page */
+
+.candidates-container {
+    width: 100%;
+    padding: 25px 30px;
+    box-sizing: border-box;
+    color: #1e293b;
+}
+
+/* Page Header */
+
+.candidates-container h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: #173b70;
+    margin-bottom: 8px;
+}
+
+.candidates-container > p {
+    color: #718096;
+    font-size: 15px;
+    margin-bottom: 30px;
+}
+
+/* Election Title */
+
+.candidates-container h2 {
+    font-size: 21px;
+    color: #173b70;
+    font-weight: 700;
+    margin-top: 30px;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #e5eaf2;
+}
+
+/* Position Heading */
+
+.candidates-container h3 {
+    font-size: 17px;
+    color: #334155;
+    font-weight: 700;
+    margin: 22px 0 15px;
+}
+
+/* Candidate List */
+
+.candidate-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+/* Candidate Card */
+
+.candidate-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 18px;
+    text-align: center;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.candidate-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 18px rgba(23, 59, 112, 0.10);
+}
+
+/* Candidate Photo */
+
+.candidate-card img {
+    width: 125px;
+    height: 125px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 4px solid #eaf0fa;
+    margin-bottom: 14px;
+}
+
+/* Candidate Name */
+
+.candidate-card h4 {
+    font-size: 17px;
+    font-weight: 700;
+    color: #173b70;
+    margin: 5px 0 10px;
+}
+
+/* Party Name */
+
+.candidate-card p:first-of-type {
+    font-size: 14px;
+    font-weight: 600;
+    color: #3267c8;
+    margin-bottom: 8px;
+}
+
+/* Candidate Slogan */
+
+.candidate-card p:last-of-type {
+    font-size: 13px;
+    color: #718096;
+    line-height: 1.5;
+    margin: 0;
+}
+
+/* Empty Messages */
+
+.candidates-container > p {
+    line-height: 1.6;
+}
+
+/* Responsive Design */
+
+@media (max-width: 768px) {
+    .candidates-container {
+        padding: 20px 15px;
+    }
+
+    .candidates-container h1 {
+        font-size: 24px;
+    }
+
+    .candidate-list {
+        grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+        gap: 12px;
+    }
+
+    .candidate-card {
+        padding: 14px;
+    }
+
+    .candidate-card img {
+        width: 105px;
+        height: 105px;
+    }
+}
+
+@media (max-width: 480px) {
+    .candidate-list {
+        grid-template-columns: 1fr;
+    }
+}

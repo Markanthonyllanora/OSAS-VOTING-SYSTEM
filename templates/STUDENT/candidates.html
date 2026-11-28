@@ -1,0 +1,60 @@
+
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Candidates{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'STUDENT/css/student_candidates.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="candidates-container">
+    
+    <h1>Candidates</h1>
+    <p>View the candidates running in the current election.</p>
+
+    {% for section in election_sections %}
+
+        <h2>{{ section.election.title }}</h2>
+
+        {% for position in section.positions %}
+
+            <h3>{{ position.name }}</h3>
+
+            <div class="candidate-list">
+
+                {% for candidate in position.candidates %}
+
+                    <div class="candidate-card">
+
+                        {% if candidate.photo %}
+                            <img src="{{ candidate.photo.url }}" alt="{{ candidate.full_name }}">
+                        {% endif %}
+
+                        <h4>{{ candidate.full_name }}</h4>
+                        <p>{{ candidate.party_name }}</p>
+                        <p>{{ candidate.slogan }}</p>
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        {% empty %}
+
+            <p>No candidates available for this election.</p>
+
+        {% endfor %}
+
+    {% empty %}
+
+        <p>There are currently no ongoing elections.</p>
+
+    {% endfor %}
+
+</div>
+
+{% endblock %}
